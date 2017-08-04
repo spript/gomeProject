@@ -5,17 +5,19 @@
             <ul v-if="!error">
             	<li></li>
                 <li v-if="userInfo.isRegistered && userInfo.isApproved > 0" :class="{'actived': $route.path === '/app/index', 'head-nav-item': true}"><router-link to="/app/index">首页</router-link></li>
-                <li v-if="userInfo.isRegistered && userInfo.isApproved  > 0" :class="{'actived': /^\/app\/account\/|^\/app\/account$/.test($route.path), 'head-nav-item': true}"><router-link to="/app/account">我的账户</router-link></li>
                 <li v-if="userInfo.isRegistered && userInfo.isApproved  > 0" :class="{'actived': /^\/app\/put\/|^\/app\/put|^\/app\/bidcpc|^\/app\/bidcpc$/.test($route.path), 'head-nav-item': true}">
-                	<a href="" @click.prevent="showSubMenu = !showSubMenu">产品线</a>
-                	<ul class="head-menu" v-show="showSubMenu">
-                		<li :class="{'is-active': /^\/app\/put\/|^\/app\/put$/.test($route.path), 'head-menu-item': true}" @click="showSubMenu = !showSubMenu" v-if="userInfo.isTest !== 1"><router-link to="/app/put" tag="span">定价cpc</router-link></li>
-                		<li :class="{'is-active': /^\/app\/bidcpc\/|^\/app\/bidcpc$/.test($route.path), 'head-menu-item': true}" @click="showSubMenu = !showSubMenu"><router-link to="/app/bidcpc" tag="span">竞价cpc</router-link></li>
-                	</ul>
+                	<a href="javascript:" ref="submenu-title">产品线</a>
+                    <transition name="el-zoom-in-top">
+                    	<ul class="head-menu" v-show="showSubMenu" ref="submenu-menu">
+                    		<li :class="{'is-active': /^\/app\/put\/|^\/app\/put$/.test($route.path), 'head-menu-item': true}" @click="showSubMenu = !showSubMenu" v-if="userInfo.isTest !== 1"><router-link to="/app/put" tag="span">定价cpc</router-link></li>
+                    		<li :class="{'is-active': /^\/app\/bidcpc\/|^\/app\/bidcpc$/.test($route.path), 'head-menu-item': true}" @click="showSubMenu = !showSubMenu"><router-link to="/app/bidcpc" tag="span">竞价cpc</router-link></li>
+                    	</ul>
+                    </transition>
                 </li>
                 <!-- <li v-if="userInfo.isRegistered && userInfo.isApproved  > 0" :class="{'actived': /^\/app\/report\/|^\/app\/report$/.test($route.path), 'head-nav-item': true}"><router-link to="/app/report">数据报表</router-link></li> -->
 				<!--<li :class="{'actived': /^\/app\/register\/|^\/app\/register/.test($route.path)}"><router-link to="/app/register">商家入驻</router-link></li>-->
 				<li v-if="userInfo.isRegistered && userInfo.isApproved  > 0" :class="{'actived': /^\/app\/tools\/|^\/app\/tools$/.test($route.path), 'head-nav-item': true}"><router-link to="/app/tools">工具</router-link></li>
+				<li v-if="userInfo.isRegistered && userInfo.isApproved  > 0" :class="{'actived': /^\/app\/account\/|^\/app\/account$/.test($route.path), 'head-nav-item': true}"><router-link to="/app/account">我的账户</router-link></li>
             </ul>
         </div>
         <div @click="controlLogoutStatus()" class="header-login">
@@ -43,6 +45,7 @@ export default {
 	name: 'head',
 	data() {
 		return {
+            timeout: null,
 			showSubMenu: false,
 			logoutStatus: false,
 			avatar:require('../../assets/img/user-face.png')
@@ -67,6 +70,7 @@ export default {
 			this.logoutStatus = false;
             this.showSubMenu = false;
 		});
+        this.initEvents();
 	},
 	methods: {
 		controlLogoutStatus() {
@@ -84,6 +88,20 @@ export default {
 						});
 					}
 				});
+		},
+		handleMouseenter() {
+			this.showSubMenu = true;
+		},
+		handleMouseleave() {
+			this.showSubMenu = false;
+		},
+		initEvents() {
+			let submenuTitle = this.$refs['submenu-title'];
+			let submenuMenu = this.$refs['submenu-menu'];
+			submenuTitle.addEventListener('mouseenter', this.handleMouseenter);
+			submenuTitle.addEventListener('mouseleave', this.handleMouseleave);
+			submenuMenu.addEventListener('mouseover', this.handleMouseenter);
+			submenuMenu.addEventListener('mouseleave', this.handleMouseleave);
 		}
 	}
 };

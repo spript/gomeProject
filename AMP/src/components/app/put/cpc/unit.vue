@@ -12,16 +12,9 @@ export default {
 	data() {
 		return {
 			breadcrumbConfig: {
-				data: [{
-					msg: '投放管理',
-					link: '/#/app/put/'
-				}, {
-					msg: '投放计划',
-					link: '/#/app/put/plan'
-				}, {
-					msg: '投放单元',
-					link: '/#' + this.$route.path
-				}]
+				msg: '投放单元',
+		        link: '/#/app/put/plan',
+		        showBack: true
 			}
 		};
 	},

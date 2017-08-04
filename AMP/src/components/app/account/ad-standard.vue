@@ -362,13 +362,8 @@ export default {
 	data() {
 		return {
 			breadcrumbConfig: {
-				data: [{
-					msg: '我的账户',
-					link: '/#/app/account/'
-				}, {
-					msg: '广告审核规范',
-					link: '/#' + this.$route.path
-				}]
+				msg: '广告审核规范',
+				showBack: false
 			}
 		};
 	},

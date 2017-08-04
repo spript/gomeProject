@@ -1,31 +1,37 @@
 <template>
-	<div class="amp-form">
-		<div class="form-column">
-			<div class="fn-plan">
-			<span class="plan-title">页面名称：</span>
-				<el-input v-model="search.name" :maxlength="30" placeholder="请输入页面名称" style="width:170px;display:inline-block;">
-				</el-input>
-			</div>
-			<div class="fn-plan" style="margin-top:20px;">
-				<span class="plan-title">设备类型： </span>
-				<el-select v-model="search.platform" style="width:170px;display:inline-block;" placeholder="APP">
-					 <el-option v-for="item in platform.options" :label="item.label" :value="item.value"></el-option>
-				</el-select>
-			</div>
-			<div style="margin-top:20px;" prop="image">
-				<div v-if class="uploade-show uploade-select">
-					<ul>
-						<li @click.prevent.stop="selectImg(index)" v-for="(img, index) in data.list" :class="{'actived': img.checked}">
-							<span class="show-img"><img :src="img.preview" alt=""></span>
-							<span style="" class="selectImgTitle">
-								{{img.pageTemplateDesc}}
+	<el-form :model="formData" ref="formData" :rules="formRules" label-width="100px" >
+		<div class="amp-form">
+			<div class="form-column">
+				<el-form-item label="页面名称：" prop="name">
+					<el-input v-model="formData.name" placeholder="请输入页面名称" style="width:170px;display:inline-block;"></el-input>
+				</el-form-item>
+				<el-form-item label="设备类型：" prop="platform">无线</el-form-item>
+				<el-form-item label="模板：" prop="pageTemplateId">
+					<el-input v-model="formData.pageTemplateId" style="display: none"></el-input>
+					<div v-if class="uploade-show uploade-select">
+						<ul>
+							<li @click.prevent.stop="selectImg(index)" v-for="(img, index) in data.list" :class="{'actived': img.checked}">
+								<span class="show-img"><img :src="img.preview" alt=""></span>
+								<span class="selectImgTitle" v-if="img.pageTemplateId == 1">
+									<h3>模板一</h3><span>(适用于有腔调中间页)</span>
+								</span>
+								<span class="selectImgTitle" v-if="img.pageTemplateId == 2">
+									<h3>模板二</h3><span>(适用于店铺中间页)</span>
+								</span>
+								<span class="selectImgTitle" v-if="img.pageTemplateId == 3">
+									<h3>模板三</h3><span>(适用于视频类型)</span>
+								</span>
+								<span class="selectImgTitle" v-if="img.pageTemplateId == 4">
+									<h3>模板四</h3><span>(适用于清单中间页)</span>
+								</span>
 							</span>
-						</li>
-					</ul>
-				</div>
+							</li>
+						</ul>
+					</div>
+				</el-form-item>
 			</div>
 		</div>
-	</div>
+	</el-form>
 </template>
 <script>
 import store from 'store';
@@ -37,6 +43,11 @@ export default {
 	name: 'app-page-template',
 	data() {
 		return {
+			formData:{
+				name:'',
+				platform: '1',
+				pageTemplateId:''
+			},
 			platform: {
 				options: [{
 					label: "无线",
@@ -50,31 +61,45 @@ export default {
 			},
 			list: [],
 			data: {},
-			formData: {},
+			formRules:{
+				name: [{
+					validator: function (rule, value, callback) {
+						if (value.trim() == '') {
+							callback(new Error('请输入页面名称'));
+						}else {
+							callback();
+						}
+					}, trigger: 'blur'
+				}],
+				pageTemplateId: [{
+					validator: (rule, value, callback) => {
+					    if (this.formData.pageTemplateId == '') {
+					        callback(new Error('请选择模板'))
+						} else {
+					        callback();
+						}
+					}
+				}],
+			}
 		};
 	},
 	created() {
 		this.getTemplate();
 	},
 	mounted() {
-		Event.$off('template-save');
+	    Event.$off('template-save');
 		Event.$on('template-save', () => {
-			if (this.search.name.length === 0) {
-				this.$message({
-					message: '请填写页面名称',
-					type: 'error'
-				});
-			} else if (this.search.pageTemplateId === '') {
-				this.$message({
-					message: '请填选择模板',
-					type: 'error'
-				});
-			} else {
-				Event.$emit('template-save-result', this.search);
-			}
+			this.$refs.formData.validate((result) => {
+			    if(result){
+					Event.$emit('template-save-result', this.formData);
+				}
+			})
 		});
 	},
 	methods: {
+		trim(type) {
+			this.formData[type] = this.formData[type].replace(/(^\s*)|(\s*$)/g, "");
+		},
 		getTemplate() {
 			let search = this.search, vm = this;
 			Http.get('/api/pageTemplates', {
@@ -93,12 +118,11 @@ export default {
 			});
 		},
 		selectImg(index,id) {
-			this.formData.image = this.data.list[index].preview;
 			this.data.list.forEach((item) => {
 				item.checked = false;
 			});
 			this.data.list[index].checked = true;
-			this.search.pageTemplateId = this.data.list[index].pageTemplateId;
+			this.formData.pageTemplateId = this.data.list[index].pageTemplateId;
 		}
 	},
 	watch: {
@@ -109,15 +133,20 @@ export default {
 	}
 };
 </script>
-<style scoped>
+<style lang="less" scoped>
 	.error {
 		color: #ff5151;
 	}
-
 	.amp-form {
-		margin: 0px 400px 0px;
+		width:545px;
+		margin: 0 auto;
+		label{
+			wigth:140px;
+		}
 	}
-
+	.uploade-show{
+		padding-top:0;
+	}
 	.uploade-show ul li .show-img {
 		position: relative;
 		display: block;
@@ -126,12 +155,18 @@ export default {
 		border: 1px solid #d9dbde;
 		border-radius: 4px;
 	}
-
+	.uploade-show ul li img:hover{
+		border:2px solid #d30312;
+		box-sizing: border-box;
+	}
 	.uploade-show ul li {
 		float: left;
-		margin: 10px 10px 0px 0px;
-		width: 140px;
-		height: 240px;
+		margin: 10px 20px 0px 0px;
+		width: 128px;
+		height: 300px;
+		&:hover{
+		 	box-sizing: border-box;
+		}
 	}
 
 	.form-column .fn-plan .plan-title {
@@ -145,13 +180,19 @@ export default {
 		font-size: 14px;
 		color: #23272c;
 	}
-
+    .selectImgTitle h3{
+		font-size: 14px;
+		color:#23272c;
+		line-height: 1;
+		margin: 10px 0 -3px 0;
+	}
+	.selectImgTitle p{
+		color:#89919c;
+		font-size: 12px;
+	}
 	.selectImgTitle {
 		text-align: center;
 		display: block;
 		font-size: 12px;
-	}
-	.uploade-select ul li .show-img:after, .uploade-select ul li .show-img:before{
-		bottom: 4px;
 	}
 </style>

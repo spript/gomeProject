@@ -22,7 +22,9 @@ import './ui.js';
 import Http from 'http';
 import actions from 'actions';
 import moment from 'moment';
+import vueMoment from 'vue-moment';
 
+Vue.use(vueMoment);
 
 Http.get('api/user', {
 		hideLoading: true

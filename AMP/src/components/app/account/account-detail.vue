@@ -17,13 +17,8 @@ export default {
 	computed: {
 		breadcrumbConfig(){
 			return {
-				data: [{
-					msg: '我的账户',
-					link: '/#/app/account/'
-				}, {
-					msg: /account-day-detail/.test(this.$route.path) ? '现金账户明细':'账户明细',
-					link: '/#' + this.$route.path
-				}]
+				msg: '账户明细',
+				showBack: false
 			};
 		}
 	}

@@ -47,7 +47,6 @@ em {
 body {
   background: #f6f5ee;
   min-width: 1200px; }
-
 .wrap-box {
   width: 1200px;
   margin: 0 auto; }
@@ -605,7 +604,6 @@ body {
     visibility: hidden; }
 
 .amp-data {
-  margin-top: 12px;
   padding-bottom: 8px;
   background: #fff; }
 
@@ -667,6 +665,10 @@ body {
       *zoom: 1;
       vertical-align: middle; }
       .table-list span .operat-link a {
+        display: inline-block;
+        white-space: nowrap;
+        padding-right: 18px; }
+      .table span .operat-link a {
         display: inline-block;
         white-space: nowrap;
         padding-right: 18px; }
@@ -790,7 +792,7 @@ body {
     .table tr th .icon-select {
       color: #a7b1bd; }
   .table tr:hover {
-    background: #f2faff !important; }
+    background: #f7fafc; }
     .table tr.actived .icon-select {
       color: #d30312; }
       .table tr.actived .icon-select:before {
@@ -1551,7 +1553,14 @@ body {
 
 .icon {
   font-size: 16px; }
-
+.icon-ideaDel:before{
+	content: '\e92b';
+}
+.icon-selectColor:before{
+	content: '\e932';
+}
+.icon-selecton:before{
+	content: '\e91f';}
 .icon-survey:before {
   content: '\e924'; }
 
@@ -1586,13 +1595,20 @@ body {
   background: #d30312;
   -webkit-border-radius: 4px;
   border-radius: 4px; }
-
+.icon-failed:before{
+	content: '\e92a';
+}
+.icon-del-hover:before{
+	content: '\e92c';
+}
 .icon-balance:before {
   content: '\e913'; }
 
 .icon-aptitude:before {
   content: '\e90d'; }
-
+.icon-doubt:before{
+	content: '\E929';
+}
 .icon-verify:before {
   content: '\e910'; }
 
@@ -1773,6 +1789,9 @@ a {
   .add-fn .btn {
     position: relative;
     display: block; }
+	.add-fn .btn+span{
+		vertical-align: middle;
+	}
     .add-fn .btn:before {
       content: '';
       position: absolute;
@@ -1780,9 +1799,9 @@ a {
       top: 50%;
       margin-left: -9px;
       margin-top: -1px;
-      width: 18px;
-      height: 2px;
-      background: #aaa; }
+      width: 19px;
+      height: 3px;
+      background: #646b73; }
     .add-fn .btn:after {
       content: '';
       position: absolute;
@@ -1790,9 +1809,9 @@ a {
       top: 50%;
       margin-left: -1px;
       margin-top: -9px;
-      width: 2px;
-      height: 18px;
-      background: #89919c; }
+      width: 3px;
+      height: 19px;
+      background: #646b73; }
 
 .amp-path {
   padding-left: 16px;
@@ -1834,7 +1853,10 @@ a {
     margin-right: 10px; }
   .amp-account .set-option .btn-back-up {
     padding: 0px 15px; }
-
+.amp-account .set-option .set-option-hint{
+      color: #eb3542;
+      font-size: 12px;
+  }
 .amp-module {
   background: #fff; }
 
@@ -1896,3 +1918,10 @@ a {
         top: 38px; }
   .set-fn .fn-search {
     float: left; }
+  .clearfix:after{
+  content: "";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+  }

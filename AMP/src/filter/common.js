@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import moment from 'moment';
 
 /*
  * 格式化时间
@@ -34,4 +35,17 @@ Vue.filter('date', (value, format) => {
 Vue.filter('currency', (value, sep, dot) => {
 	// 以 分 为单位进行格式化
 	return (sep || '') + (value/100).toFixed(dot || 2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+});
+
+/**
+ * 时间格式转化filter
+ * 大于2038年1月1日的时间
+ *
+ */
+Vue.filter('formatTime', (value, format, maxTime, maxString) => {
+	if (value >= maxTime) {
+		return '长期有效';
+	} else {
+		return moment(new Date(value)).format(format);
+	}
 });

@@ -162,6 +162,20 @@
     font-size: 14px;
 }
 
+.Unitrebate .el-form-item__error{
+	left: 287px!important;
+	top: 36px!important;
+}
+.daliyRebate .el-form-item__error{
+	top: 35px;
+	left: 143px;
+}
+.rebateContent .el-form-item__error{
+	left: 330px!important;
+}
+.questionRebate .el-form-item__error{
+	left:480px!important;
+}
 .el-form-item__error{
     color: #ff4949;
     font-size: 12px;

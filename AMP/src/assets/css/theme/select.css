@@ -926,7 +926,7 @@
 .el-select .el-input{}
 
 .el-select .el-input .el-input__icon{
-    color: #c0ccda;
+    color: #23272c;
     font-size: 12px;
     transition: transform .3s;
     transform: translateY(-50%) rotateZ(180deg);

@@ -6,71 +6,86 @@
 					<el-input v-model="formData.name" placeholder="请输入创意名称" :disabled="actionType === 'modify'"></el-input>
 				</el-form-item>
 				<el-form-item v-if="isShop || isVideo || isWebpage" label="URL地址：" prop="landingPage">
-					<el-row>
+					<el-col>
 						<el-col :span="16">
-							<el-input v-model="formData.landingPage" placeholder="请从自建页面选择url" :readonly="true" style="width:100%;display:inline-block;margin-right:20px;" :title="formData.landingPage" :disabled="isUrlModifyDisabled"></el-input>
+							<el-input v-model="formData.landingPage" placeholder="请从自建页面选择url" :readonly="true" style="width:100%;display:inline-block;margin-right:20px;" :title="formData.landingPage" :disabled="isUrlModifyDisabled || formData.landingPage.length > 0"></el-input>
 						</el-col>
 						<el-col :span="1">&nbsp;</el-col>
 						<el-col :span="7">
-							<el-button type="primary" @click="isShowAddUrl = true" :disabled="isUrlModifyDisabled">从自建页面获取</el-button>
+							<el-button type="primary" class='URLbtn' @click="isShowAddUrl = true" :disabled="isUrlModifyDisabled">从自建页面获取</el-button>
 						</el-col>
-					</el-row>
+					</el-col>
 				</el-form-item>
 				<div v-if="isShop" data-type="好店">
-					<el-form-item v-if="formData.landingPage.length > 0" label="店铺名称：" prop="title">
-						<el-input v-model="formData.title" placeholder="店铺名称" :disabled="true"></el-input>
-					</el-form-item>
-					<el-form-item v-if="formData.landingPage.length > 0" label="店铺文案：" prop="description">
-						<el-input v-model="formData.description" type="textarea" :autosize="{minRows: 3}" placeholder="店铺文案" :disabled="true" resize="none"></el-input>
-					</el-form-item>
-					<el-form-item label="图片(1~9张)" prop="image" :required="true">
-						<div class="row-photo-s" style="width: 100%;" @click="shop_selectImage">
-							<input id="shopPicture" type="file" @change="shop_imageChange" accept="image/jpg,image/jpeg,image/png" >
-							<div class="imgupload">点击上传</div>
-							<div class="el-upload__tip" style="width:100%">只能上传长宽比为1:1的图片文件</div>
+					<div class="Content" v-if="formData.landingPage.length > 0">
+						<label class="el-form-item__label" style="width: 124px;"></label>
+						<div class="GoodContent">
+							<el-form-item v-if="formData.landingPage.length > 0" label="店铺名称：" prop="title">
+								<el-input v-model="formData.title" placeholder="店铺名称" :disabled="true"></el-input>
+							</el-form-item>
+							<el-form-item v-if="formData.landingPage.length > 0" label="店铺文案：" prop="description">
+								<el-input v-model="formData.description" type="textarea" :autosize="{minRows: 3}" placeholder="店铺文案" :disabled="true" resize="none"></el-input>
+							</el-form-item>
 						</div>
-						<el-upload
-							class="upload-demo"
-							:action="uploadUrl"
-							:on-remove="shop_remove"
-							:file-list="shopImageList"
-							list-type="picture"
-						>
-							<!-- <el-button size="small" type="primary">点击上传</el-button> -->
-							<!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
-						</el-upload>
+					</div>
+					<el-form-item label="图片:" prop="image" :required="true">
+						<div class="row-photo-s" style="width: 100%;">
+							<input id="shopPicture" type="file" @change="shop_imageChange" accept="image/jpg,image/jpeg,image/png" >
+							<div class="imgupload"  @click="shop_selectImage" style="display: inline-block">上传图片</div>
+							<span style="margin-left: 10px"><em :style="{color:shopImageList.length==9?'#d9444b':'#596069'}">{{shopImageList.length}}</em>/9</span>
+							<div class="el-upload__tip" style="width:100%">只能上传宽高比为1:1的图片文件</div>
+							<div class="SKUerror" v-if="validateMsg.Img.isError">{{validateMsg.Img.errorMsg}}</div>
+						</div>
+						<div class="shopImageList" v-if="shopImageList.length > 0">
+							<ul>
+								<li v-for="(item,index) in shopImageList">
+									<img :src="item.url">
+									<em class="iconbg"></em>
+									<em class="icon icon-shut" @click="shop_remove(index)"></em>
+								</li>
+							</ul>
+						</div>
 					</el-form-item>
 				</div>
 				<div v-if="isVideo" data-type="视频">
-					<el-form-item v-if="formData.landingPage.length > 0" label="广告标题：" prop="title">
-						<el-input v-model="formData.title" placeholder="广告标题" :disabled="true"></el-input>
-					</el-form-item>
-					<el-form-item v-if="formData.landingPage.length > 0" label="封面图片：" prop="image" :required="true">
-						<div class="content-box">
-							<img class="material-image" :src="formData.image.length > 0 ? formData.image[0] : ''">
+					<div class="Content" v-if="formData.landingPage.length > 0">
+						<label class="el-form-item__label" style="width: 124px;"></label>
+						<div class="GoodContent">
+							<el-form-item v-if="formData.landingPage.length > 0" label="广告标题：" prop="title">
+								<el-input v-model="formData.title" placeholder="广告标题" :disabled="true"></el-input>
+							</el-form-item>
+							<el-form-item v-if="formData.landingPage.length > 0" label="封面图片：" prop="image" :required="true">
+								<div class="content-box">
+									<img class="material-image" :src="formData.image.length > 0 ? formData.image[0] : ''">
+								</div>
+							</el-form-item>
 						</div>
-					</el-form-item>
+					</div>
 				</div>
 				<div v-if="isWebpage" data-type="清单">
-					<el-form-item v-if="formData.landingPage.length > 0" label="清单名称：" prop="title">
-						<el-input v-model="formData.title" placeholder="清单名称" :disabled="true"></el-input>
-					</el-form-item>
-					<el-form-item v-if="formData.landingPage.length > 0" label="创意图片：" prop="image">
-						<div class="content-box">
-							<img class="material-image" :src="formData.image[0]">
+					<div class="Content" v-if="formData.landingPage.length > 0">
+						<label class="el-form-item__label" style="width: 124px;"></label>
+						<div class="GoodContent">
+							<el-form-item v-if="formData.landingPage.length > 0" label="清单名称：" prop="title">
+								<el-input v-model="formData.title" placeholder="清单名称" :disabled="true"></el-input>
+							</el-form-item>
+							<el-form-item v-if="formData.landingPage.length > 0" label="创意图片：" prop="image">
+								<div class="content-box">
+									<img class="material-image" :src="formData.image[0]">
+								</div>
+							</el-form-item>
 						</div>
-					</el-form-item>
+					</div>
 				</div>
 				<div v-if="isBothTopicAndWebpage || isGood || isTopic" data-type="精选、有腔调和好东西合集">
-					<!-- -->
 					<el-form-item label="链接类型：" v-if="isBothTopicAndWebpage || isGood">
 						<el-select v-model="formData.linkType" :disabled="isLinkTypeModifyDisabled">
 							<el-option v-for="item in linkType" :label="item.name" :value="item.value" :disabled="item.disabled"></el-option>
 						</el-select>
 					</el-form-item>
 					<!-- 链接类型选了话题时显示此项 -->
-					<el-form-item v-if="formData.linkType === 4" label="选择话题：" prop="topicName" :disabled="actionType === 'modify'">
-						<el-select v-model="formData.topicName" style="display: inline-block; width:342px; margin: 0 5px 0 0;" :disabled="actionType === 'modify'" remote filterable clearable placeholder="请输入话题名称"
+					<el-form-item v-if="formData.linkType === 4" label="搜索话题：" prop="topicName" :disabled="actionType === 'modify'">
+						<el-select v-model="formData.topicName" style="display: inline-block; width:400px; margin: 0 5px 0 0;" :disabled="actionType === 'modify'" remote filterable clearable placeholder="请输入话题名称"
 								   :remote-method="topic_remoteMethod" no-match-text="未找到结果"  id="topicNameSelect" popper-class="optionList"
 								   ref="select" @change="topic_selectChange" v-enter @enter.native="topic_log">
 							<el-option  v-for="item in topicUseData.topicList" :key="item.value" :label="item.label +'-- '+ item.author"
@@ -81,7 +96,7 @@
 								</span>
 							</el-option>
 						</el-select>
-						<div class="seeTopic"><a :disabled="topicUseData.previewUrl === ''" target="_blank" id="seeTopic"  >点击预览话题</a></div>
+						<div class="seeTopic"><a :disabled="topicUseData.previewUrl === ''" target="_blank" id="seeTopic"  >预览</a></div>
 					</el-form-item>
 					<!-- 链接类型选了url后显示此项 -->
 					<!-- <el-form-item v-if="formData.linkType === 2" label="URL地址：" prop="name">
@@ -94,57 +109,65 @@
 							</el-col>
 							<el-col :span="1">&nbsp;</el-col>
 							<el-col :span="7">
-								<el-button type="primary" @click="isShowAddUrl = true" :disabled="isUrlModifyDisabled">从自建页面获取</el-button>
+								<el-button  class='URLbtn' @click="isShowAddUrl = true" :disabled="isUrlModifyDisabled">从自建页面获取</el-button>
 							</el-col>
 						</el-row>
 					</el-form-item>
 					<!-- 链接类型选了商品编号后显示此项 -->
-					<el-form-item v-if="isGood" label="商品编号：" prop="promotionId" :rules="formRules.skuId">
-						<el-input v-model="formData.promotionId" placeholder="请输入商品编号" @blur="good_getProductWithSkuId" :disabled="actionType === 'modify'"></el-input>
-					</el-form-item>
-					<el-form-item label="广告标题：" prop="title">
-						<el-input v-model="formData.title" :placeholder="!isGood ? '广告标题' : '请输入正确的商品编号后修改'" :readonly="formData.linkType === 2" :disabled="isGood && !goodUseData.isSkuIdVisible"></el-input>
-					</el-form-item>
-					<el-form-item label="创意图片：" prop="image" v-if="isGood">
-						<span v-if="!goodUseData.allImgList.length">无</span>
-						<div v-else class="uploade-show uploade-select">
-							<ul>
-								<li @click.prevent.stop="good_selectImg(index)" v-for="(item, index) in goodUseData.allImgList" :class="{'actived': item.checked}"><span class="show-img"><img :src="item.url" alt=""></span></li>
-							</ul>
+					<div class="Content">
+						<label class="el-form-item__label" style="width: 124px;">{{isGood == true? '商品：':''}}</label>
+						<div class="GoodContent">
+							<el-form-item v-if="isGood" label="SKU ID：" prop="promotionId" :rules="formRules.skuId">
+								<el-input v-model="formData.promotionId" placeholder="SKU ID"  @blur="good_getProductWithSkuId"
+										  :disabled="actionType === 'modify'"></el-input>
+							</el-form-item>
+							<el-form-item label="广告标题：" prop="title">
+								<el-input v-model="formData.title" :placeholder="!isGood ? '广告标题' : '请输入正确的SKU ID后修改'" :readonly="formData.linkType === 2" :disabled="isGood && !goodUseData.isSkuIdVisible"></el-input>
+								<div class="el-upload__tip">前端自适应屏幕大小，超过一行时，超出的部分前端会用省略号截断。</div>
+							</el-form-item>
+							<el-form-item label="商品图片：" prop="image" v-if="isGood" class="SKUbox">
+								<div v-if="!goodUseData.allImgList.length">
+									<span class="noImage">暂无图片</span>
+								</div>
+								<div v-else class="uploade-show uploade-select">
+									<m-image-scroll v-model="goodUseData.allImgList" :index="0"></m-image-scroll>
+								</div>
+							</el-form-item>
+							<el-form-item v-if="isBothTopicAndWebpage || isTopic" label="创意图片：" prop="image">
+								<div class="row-photo-s" style="width: 100%;" >
+									<input id="topPicture" type="file" @change="material_imageChange" accept="image/jpg,image/jpeg,image/png" >
+									<div class="btn btn-normal" @click="material_selectImage">点击上传</div>
+									<span>{{validateMsg.Img.imgUrlName}}</span>
+									<div class="el-upload__tip" style="width:100%">只能上传宽高比为2:1的图片文件</div>
+									<div class="SKUerror" v-if="validateMsg.Img.isError">{{validateMsg.Img.errorMsg}}</div>
+								</div>
+								<img v-if="formData.image.length > 0" class="material-image" :src="formData.image[0]" style="width: 100%;">
+							</el-form-item>
+							<el-form-item v-if="isGood || isTopic || isBothTopicAndWebpage" label="广告文案：" prop="description">
+								<el-input v-model="formData.description" type="textarea" :autosize="{minRows: 4}" placeholder="广告文案" :disabled="!goodUseData.isSkuIdVisible && isGood"></el-input>
+							</el-form-item>
 						</div>
-					</el-form-item>
-					<el-form-item v-if="isBothTopicAndWebpage || isTopic" label="创意图片：" prop="image">
-						<div class="row-photo-s" style="width: 100%;" @click="material_selectImage">
-							<input id="topPicture" type="file" @change="material_imageChange" accept="image/jpg,image/jpeg,image/png" >
-							<div class="imgupload">点击上传</div>
-							<div class="el-upload__tip" style="width:100%">只能上传长宽比为2:1的图片文件</div>
 						</div>
-						<img v-if="formData.image.length > 0" class="material-image" :src="formData.image[0]" style="width: 100%;">
-					</el-form-item>
-					<el-form-item v-if="isGood || isTopic || isBothTopicAndWebpage" label="广告文案：" prop="description">
-						<el-input v-model="formData.description" type="textarea" :autosize="{minRows: 4}" placeholder="广告文案" :disabled="!goodUseData.isSkuIdVisible && isGood"></el-input>
-					</el-form-item>
 				</div>
-				<el-form-item v-if="!isGood" label="跟单商品：" prop="isSelectProducts">
+				<el-form-item v-if="!isGood" label="跟单商品" prop="isSelectProducts">
+					<el-tooltip placement="right" effect="light">
+						<div slot="content">若您在跳转后的链接内也输入了跟单商品，<br/>则在统计效果时，此页面和在跳转后的链接<br/>内输入的商品SKU都会被统计到。</div>
+						<div class="SKUtipicon"><em class="icon icon-doubt"></em></div>
+					</el-tooltip>
 					<el-checkbox v-model="isSelectProducts" :label="true" :disabled="isProModifyDisabled">
 						添加跟单商品
-						<el-tooltip placement="right" effect="light">
-							<div slot="content">若您在跳转后的链接内也输入了跟单商品，<br/>则在统计效果时，此页面和在跳转后的链接<br/>内输入的商品SKU都会被统计到。</div>
-							<span class="SKUtipicon">?</span>
-						</el-tooltip>
 					</el-checkbox>
 				</el-form-item>
-				<el-form-item v-if="isSelectProducts || (isGood && isRebate)" :label="isGood ? '联合推广商品：' : ''">
+				<el-form-item v-if="isSelectProducts || (isGood && isRebate)" :label="isGood ? '联合推广商品：' : ''" >
 					<el-col :span="8" v-for="(product, index) in formData.products" style="padding: 0 5px 20px;">
 						<el-form-item
 							:key="index"
 							:prop="'products.' + index + '.skuId'"
-							:rules="formRules.formDataProductSkuRules"
-						>
+							:rules="formRules.formDataProductSkuRules">
 							<el-input v-model="product.skuId" placeholder="请输入商品SKU" :disabled="isProModifyDisabled"></el-input>
 						</el-form-item>
 					</el-col>
-					<div class="detail-row detail-row-mr add-fn" v-if="selectProductCount < 9"><span class="btn btn-normal" @click="normal_addProducts"></span></div>
+					<div class="detail-row detail-row-mr add-fn" v-if="selectProductCount < 9" @click="normal_addProducts"><span class="btn btn-normal"></span><span>添加</span></div>
 					<template v-if="isGood && isRebate">
 						<div class="detail-row detail-row-mr">
 							<el-checkbox v-model="goodUseData.isAutoAddProduct.category">允许自动填充本店铺同类目商品</el-checkbox>
@@ -169,6 +192,7 @@
 	import Event from 'event';
 	import store from 'store';
 	import DrawerAddUrl from './drawer-add-url.vue';
+	import ImageScroll from '../../../common/imageScroll.vue';
 
 	Vue.directive('enter', {
 		bind: function(el) {
@@ -184,6 +208,13 @@
 		name: 'app-put-idea-new',
 		data() {
 			return {
+				validateMsg:{
+					Img:{
+						isError:false,
+						errorMsg:'',
+						imgUrlName:''
+					}
+				},
 				formData: {},
 				products: [],
 				isShowAddUrl: false,
@@ -263,7 +294,7 @@
 					title: [{
 						required: true,
 						message: '请输入广告标题',
-						trigger: 'blur'
+						trigger: 'change'
 					}],
 					image: [{
 						validator: (rule, value, callback) => {
@@ -283,8 +314,17 @@
 					}],
 					skuId: [{
 						required: true,
-						message: '请输入商品编号',
+						message: '请输入商品SKU ID',
 						trigger: 'blur'
+					},{
+					    validator:(rule,val,callback) => {
+							if(this.formData.title == '' && this.goodUseData.allImgList.length==0 && this.formData.description=='' ) {
+								callback(new Error('未查询到与SKU ID相关的商品'));
+							}else {
+							    callback();
+							}
+						},
+						trigger:'blur'
 					}],
 					landingPage: [{
 						required: true,
@@ -323,7 +363,8 @@
 			};
 		},
 		components: {
-			'm-add-url': DrawerAddUrl
+			'm-add-url': DrawerAddUrl,
+			'm-image-scroll': ImageScroll
 		},
 		computed: {
 			drawerData: () => store.state.drawerCtrl.config, // from store
@@ -333,34 +374,34 @@
 				return this.formData.flightLinkType;
 			},
 			//类型区分
-			isShop() {
-				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 0
+			isShop() {  //好店
+				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 0 //店铺
 			},
-			isVideo() {
-				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 9
+			isVideo() {  //视频
+				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 9 //视频
 			},
-			isWebpage() {
-				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 2
+			isWebpage() {  //清单
+				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 2 //自定义URL
 			},
-			isTopic() {
-				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 4
+			isTopic() {  //精选
+				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 4 //话题
 			},
-			isGood() {
-				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 1
+			isGood() { //好东西、好物
+				return this.flightLinkType.length === 1 && this.flightLinkType[0] === 1 //商品推广
 			},
 			isBothTopicAndWebpage() {
 				let isContainTopic = this.flightLinkType.find((type) => {
-					return type === 4;
+					return type === 4;  //有腔调->话题
 				});
 				let isContainWebpage = this.flightLinkType.find((type) => {
-					return type === 2;
+					return type === 2;  //有腔调->自定义URL
 				});
 				return !!isContainTopic && !!isContainWebpage;
 			},
 			good_visibleProducts() {
 				let products = [];
 				this.formData.products.forEach((product) => {
-					if (!!product.skuId && (product.hasOwnProperty('shpoId') || product.hasOwnProperty('productId'))) {
+					if (!!product.skuId && (product.hasOwnProperty('shopId') || product.hasOwnProperty('productId'))) {
 						products.push(product);
 					}
 				});
@@ -374,6 +415,17 @@
 			},
 			isLinkTypeModifyDisabled() {
 				return this.actionType === 'modify' && this.formData.approveStatus === 1;
+			},
+			relatedItemStrategy() {
+				//联合推广商品自动拉取策略
+				if (this.goodUseData.isAutoAddProduct.category && this.goodUseData.isAutoAddProduct.shop) {
+					return 3;
+				} else if (this.goodUseData.isAutoAddProduct.category && !this.goodUseData.isAutoAddProduct.shop) {
+					return 1;
+				} else if (!this.goodUseData.isAutoAddProduct.category && this.goodUseData.isAutoAddProduct.shop) {
+					return 2;
+				}
+				return 0;
 			}
 		},
 		created() {
@@ -397,9 +449,11 @@
 							this.formData.products.push({skuId: ''});
 						}
 					}
+					this.goodUseData.isAutoAddProduct.category = this.formData.relatedItemStrategy === 3 || this.formData.relatedItemStrategy === 1;
+					this.goodUseData.isAutoAddProduct.shop = this.formData.relatedItemStrategy === 3 || this.formData.relatedItemStrategy === 2;
 				}
 				this.formData.products.forEach((product) => {
-					if (!product.skuId) {
+					if (!product.skuId && product.itemId) {
 						Vue.set(product, 'skuId', product.itemId);
 					}
 				});
@@ -472,6 +526,7 @@
 								checked: item === this.formData.image[0]
 							});
 						});
+						this.len = Math.ceil(this.goodUseData.allImgList.length/3);
 					}
 				});
 			}
@@ -503,23 +558,38 @@
 			//保存创意
 			Event.$off('put-save');
 			Event.$on('put-save', () => {
+				this.validateMsg.Img.isError = false;
 				this.$refs.formData.validate((result) => {
 					if (result) {
 						if (this.isGood && this.good_visibleProducts.length < this.selectProductCount && (this.goodUseData.isAutoAddProduct.category || this.goodUseData.isAutoAddProduct.shop)) {
-							Http.get('api/material/items', {
+							Http.get('api/material/items', { //根据店铺ID和类目ID获取商品信息
 								params: this.goodUseData.isAutoAddProduct.category ? {
 									shopId: this.goodUseData.shopId,
 									categoryId: this.goodUseData.categoryId,
-									skuId: this.formData.promotionId
+									skuId: this.formData.promotionId,
+									relatedItemStrategy: this.relatedItemStrategy
 								} : {
 									shopId: this.goodUseData.shopId,
-									skuId: this.goodUseData.formData.promotionId
+									skuId: this.formData.promotionId,
+									relatedItemStrategy: this.relatedItemStrategy
 								}
 							}).then((res) => {
 								if(res.status === 200 && res.data.code === 200 && res.data.iserror === 0){
 									let lackLen = this.selectProductCount - this.good_visibleProducts.length;
-									let list = res.data.data.list.slice(0,lackLen);
-									this.formData.relatedItems = [...this.good_visibleProducts,...list];
+									let list = res.data.data.list;
+									this.formData.relatedItems = [...this.good_visibleProducts];
+									let addNumber = 0;
+									list.forEach((item) => {
+										let isCon = this.formData.relatedItems.find((seleItem) => {
+											return seleItem.skuId == item.itemId;
+										});
+										if (!isCon && addNumber < lackLen) {
+											item.skuId = item.itemId;
+											delete item.itemId;
+											this.formData.relatedItems.push(item);
+											addNumber++;
+										}
+									});
 									this.normal_saveMaterial();
 								}
 							});
@@ -579,7 +649,7 @@
 				if (this.isGood && skuId === this.formData.promotionId) {
 					return {isError: true, errorMsg: '不能与创意主商品相同'};
 				} else if (!!product) {
-					return {isError: true, errorMsg: '请填写不同的商品编号'};
+					return {isError: true, errorMsg: '已添加了该商品，请勿重复添加'};
 				} else {
 					Http.get('api/material/sku', {
 						hideLoading: true,
@@ -627,7 +697,8 @@
 					width: size.width,
 					height: size.height,
 					productLine: 2,
-					webpageId: this.webpageId !== '' ? this.webpageId : this.formData.webpageId
+					webpageId: this.webpageId !== '' ? this.webpageId : this.formData.webpageId,
+					relatedItemStrategy: this.relatedItemStrategy
 				};
 				Http({
 					url: 'api/material',
@@ -669,17 +740,12 @@
 			},
 			shop_loadFile(file) {
 				if (this.formData.image.length === 9) {
-					this.$message({
-						message: '最多只能上传9张图片',
-						type: 'warning'
-					});
-					return false;
+					this.validateMsg.Img.isError = true;
+					this.validateMsg.Img.errorMsg = '最多只能上传9张图片'
 				}
 				if (file.size > 500 *1024) {
-					this.$message({
-						message: '您上传的图片太大，请重新上传！',
-						type: 'warning'
-					});
+					this.validateMsg.Img.isError = true;
+					this.validateMsg.Img.errorMsg = '图片大小最大为500K'
 					return false;
 				}
 				let that = this;
@@ -693,13 +759,13 @@
 						let height = image.height;
 						let scale = width / height;
 						if(scale !== 1) {
-							that.$message({
-								message: '请上传长宽比为1:1的图片!',
-								type: 'warning'
-							});
+							that.validateMsg.Img.isError = true;
+							that.validateMsg.Img.errorMsg = '请上传宽高比为1:1的图片'
 						} else {
 							imageData.append('file', file);
 							that.shop_imageUpload(imageData);
+							that.validateMsg.Img.isError = false;
+							that.validateMsg.Img.errorMsg = ''
 						}
 					};
 					image.src= data;
@@ -717,10 +783,8 @@
 							// this.formData.image = [res.data.data.imageUrl];
 						}
 					}).catch((error) => {
-					that.$message({
-						message: '上传失败',
-						type: 'warning'
-					});
+					that.validateMsg.Img.isError = true;
+					that.validateMsg.Img.errorMsg = '上传失败'
 				});
 			},
 			material_selectImage() {
@@ -733,10 +797,8 @@
 			},
 			material_loadFile(file) {
 				if (file.size > 500 *1024) {
-					this.$message({
-						message: '您上传的图片太大，请重新上传！',
-						type: 'warning'
-					});
+					this.validateMsg.Img.isError = true;
+					this.validateMsg.Img.errorMsg = '图片大小最大为500K'
 					return false;
 				}
 				let that = this;
@@ -750,13 +812,14 @@
 						let height = image.height;
 						let scale = width / height;
 						if(scale !== 2) {
-							that.$message({
-								message: '请上传长宽比为2:1的图片!',
-								type: 'warning'
-							});
+							that.validateMsg.Img.isError = true;
+							that.validateMsg.Img.errorMsg = '请上传宽高比例为2:1的图片'
 						} else {
 							imageData.append('file', file);
 							that.material_imageUpload(imageData);
+							that.validateMsg.Img.isError = false;
+							that.validateMsg.Img.errorMsg = '';
+							that.validateMsg.Img.imgUrlName = file.name;
 						}
 					};
 					image.src= data;
@@ -770,10 +833,8 @@
 							this.formData.image = [res.data.data.imageUrl];
 						}
 					}).catch((error) => {
-					that.$message({
-						message: '上传失败',
-						type: 'warning'
-					});
+					this.validateMsg.Img.isError = true;
+					this.validateMsg.Img.errorMsg = '上传失败'
 				});
 			},
 			shop_uploadSuccess(response) {
@@ -795,12 +856,9 @@
 					return false;
 				}
 			},
-			shop_remove(file, fileList) {
-				console.log(fileList);
-				this.formData.image = [];
-				fileList.forEach((file) => {
-					this.formData.image.push(file.url);
-				});
+			shop_remove(index) {
+				this.shopImageList.splice(index,1);
+				this.formData.image.splice(index,1);
 			},
 			topic_log(){
 				this.formData.topicName = "";
@@ -906,7 +964,7 @@
 				}
 			},
 			good_getProductWithSkuId(event) {
-				if (this.formData.skuId === '') {
+				if (this.formData.promotionId === '') {
 					return;
 				}
 				Http.get('api/material/sku', {
@@ -945,15 +1003,6 @@
 					}
 				});
 			},
-			good_selectImg(index) {
-				this.formData.image =  [];
-				this.formData.image.push(this.goodUseData.allImgList[index].url);
-				this.goodUseData.allImgList.forEach((item) => {
-					item.checked = false;
-				});
-				this.goodUseData.allImgList[index].checked = true;
-				// this.$refs.formData.validateField('image');
-			}
 		},
 		watch: {
 			'isSelectProducts': {
@@ -968,35 +1017,230 @@
 					}
 				},
 				deep: true
-
+			},
+			'goodUseData.allImgList': {
+			    handler: function (val, oldVal) {
+			        if(val.length == 0) return;
+					this.formData.image =  [];
+					let selectImgItem = val.find((item) => {
+					    return item.checked === true;
+					});
+					if (selectImgItem) {
+						this.formData.image.push(selectImgItem.url);
+					}
+				},
+				deep: true
 			}
 		}
 	};
 </script>
 <style lang="less" scoped>
+	.SKUerror{
+		font-size: 12px;
+		color: #ff4949;
+	}
+	.shopImageList{
+		width: 300px;
+		display:block;
+		height:90px;
+		margin: 10px 0 0 0;
+		ul li{
+			float: left;
+			margin: 0px 10px 10px 0px;
+			width: 90px;
+			height: 90px;
+			position: relative;
+			&:hover{
+			  em{
+				  display: block;
+			  }
+			}
+			img{
+				border:1px solid #d9dbde;
+				box-sizing:border-box;
+				border-radius:6px;
+				width:100%;
+				height:100%;
+			}
+			em{
+				display: none;
+				position: absolute;
+				right: -6px;
+				top: -4px;
+			    &:nth-of-type(2):hover{
+					 color:#c6171e;
+				}
+				&:nth-of-type(1){
+					 top:-2px;
+					 background: #fff;
+					 width: 15px;
+					 height: 15px;
+					 border-radius: 100%;
+				}
+			}
+		}
+	}
+	.SKUtipicon{
+		margin-right: 16px;
+	}
+	.URLbtn{
+		width: 120px;
+		height: 36px;
+		text-align: center;
+		color: #23272c;
+		border: 1px solid #d9dbde;
+		padding: 0;
+		box-sizing: border-box;
+		background: linear-gradient(to bottom, #fefefe 0%, #ebebeb 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fefefe', endColorstr='#ebebeb', GradientType=0);
+		&:hover{
+			 color: #23272c;
+			 border-color: #d9dbde;
+			 background: linear-gradient(to bottom, #fefefe 0%, #ebebeb 100%);
+			 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fefefe', endColorstr='#ebebeb', GradientType=0);
+		}
+	}
+	.el-upload__tip{
+		line-height: 1.5;
+	}
+	.Content{
+		margin-bottom: 22px;
+		.GoodContent{
+			background: #f9fbfc;
+			padding:20px 30px 20px 0px;
+			margin-left: 124px;
+			.el-textarea{
+				width:290px;
+			}
+			.el-input{
+				width:290px;
+			}
+			.noImage{
+				display: block;
+				width:90px;
+				height:90px;
+				background:#ebeef1;
+				line-height: 90px;
+				border:1px solid #d9dbde;
+				box-sizing: border-box;
+				text-align: center;
+				color:#89919c;
+				font-size: 14px;
+				border-radius: 6px;
+			}
+		}
+	}
+	.SKUbox{
+		height: 90px;
+		overflow: hidden;
+		.uploade-show{
+			height: 90px;
+			padding-top: 0;
+			width:290px;
+			.show-img img{
+				border: 1px solid #d9dbde;
+				box-sizing: border-box;
+			}
+			.photoBox{
+				width: 100%;
+				height: 90px;
+				position: relative;
+				overflow: hidden;
+				button{
+					width: 20px;
+					height: 40px;
+					position: absolute;
+					top:25px;
+					background-color: rgba(0,0,0,0.3);
+					border:none;
+					border-radius: 0px;
+					z-index:2;
+				    em{
+						position: absolute;
+						position: absolute;
+						top: 12px;
+						left: 7px;
+						color:#fff;
+					}
+					&:hover{
+						background-color: rgba(0,0,0,0.5);
+						em{
+							color:#fff;
+						}
+					}
+					&:nth-of-type(1){
+						 left:0;
+					 }
+					&:nth-of-type(2){
+						 right:0;
+					 }
+				}
+				.photoContent{
+					overflow: hidden;
+					width: 100%;
+					height:90px;
+				}
+			}
+			ul li {
+				float: left;
+				margin: 0px 10px 0px 0px;
+				width: 90px;
+				height: 90px;
+			}
+		}
+	}
+	.photoContentLi{
+		float: left;
+		width: 50px;
+		height: 50px;
+		margin-left: 5px;
+	}
+	.photoContent ul{
+		position: absolute;
+		left:0;
+		top:0
+	}
+	.photoContent img{
+		width:50px;
+		height:50px
+	}
 	.content-box{
 		position: relative;
-		width: 100%;
-		height: 250px;
-		margin: 0 auto;
+		width: 160px;
+		height: 80px;
 		text-align: center;
 		background: #eee;
-	.material-image{
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		width: auto;
-		height: auto;
-		max-width: 100%;
-		max-height: 100%;
-		margin: auto;
-		vertical-align: middle;
-	}
+		.material-image{
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			width: auto;
+			height: auto;
+			width: 100%;
+			height: 100%;
+			margin: auto;
+			vertical-align: middle;
+		}
 	}
 	.add-fn{
+		cursor: pointer;
+		border-radius: 6px;
 		clear: both;
+		background-color:#d9dbde;
+		border:none;
+		text-align:center;
+		line-height: 34px;
+		font-size: 16px;
+		vertical-align: middle;
+		.btn{
+			padding:0 15px;
+			display:inline;
+			border:none;
+			border-radius:0;
+			background:none;
+		}
 	}
 	.el-upload{
 		width: 100%;
@@ -1035,15 +1279,19 @@
 	.imgupload{
 		background-image: none;
 		text-align: center;
-		font-size: 12px;
-		border-radius: 4px;
-		color: #fff;
-		background-color: #20a0ff;
-		border-color: #20a0ff;
-		width:68px;
-		height:28px;
-		line-height: 28px;
+		font-size: 14px;
+		border-radius: 6px;
+		color: #23272c;
+		border:1px solid #d9dbde;
+		box-sizing: border-box;
+		width:100px;
+		height:34px;
+		line-height: 34px;
 		cursor: pointer;
+		background:-moz-linear-gradient(top, #fefefe, #ececec);
+		background:-webkit-gradient(linear, 0 0, 0 bottom, from(#fefefe), to(#ececec));
+		background:-o-linear-gradient(top, #fefefe, #ececec);
+		background:#ececec;
 	}
 	#topPicture, #shopPicture{
 		width: 146px;

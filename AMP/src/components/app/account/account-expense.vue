@@ -19,27 +19,31 @@
 					<div class="fn-search"><a href="#" class="btn btn-primary" @click.prevent="getList">查询</a></div>
 				</div>
 				<!-- 列表-->
-				<div class="cont-list scroll-x">
-					<table class="table">
-						<thead>
-							<tr>
-								<th :width="120"><span>日期</span></th>
-								<th :width="120"><span>账户</span></th>
-								<th :width="120"><span>支出(元)</span></th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr v-for="items in data">
-								<td v-for="(item, i) in items">
-									<span v-if="i == 0">
-										<router-link :to="{name: 'account-expense-daily', params:{date:item}}">{{item}}</router-link>
-									</span>
-									<span v-else-if="i != 2">{{item}}</span>
-									<span v-else>{{item.toFixed(2)}}</span>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="amp-data">
+					<div class="data-table" id="mainDataTable">
+						<div class="main-table-wapper">
+							<table class="table main-table">
+								<thead>
+									<tr class="list-header">
+										<th :width="120"><span>日期</span></th>
+										<th :width="120"><span>账户</span></th>
+										<th :width="120"><span>支出(元)</span></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="items in data" class="body-row">
+										<td v-for="(item, i) in items">
+											<span v-if="i == 0">
+												<router-link :to="{name: 'account-expense-daily', params:{date:item}}">{{item | moment('YYYY/MM/DD')}}</router-link>
+											</span>
+											<span v-else-if="i != 2">{{item}}</span>
+											<span v-else>{{item.toFixed(2)}}</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</div>
 				<el-pagination v-show="Math.floor(page.totalCount/page.pageSize)>0"
 					@size-change="pageSizeChange"
@@ -57,6 +61,7 @@
 </template>
 <script type="text/javascript">
 import http from "http";
+import {tableHandler, offWindowEvent, initWindowResize} from 'utils/table';
 export default {
 	name: "app-account-expense",
 	data(){
@@ -75,6 +80,15 @@ export default {
 	},
 	created(){
 		this.getList();
+	},
+	mounted() {
+		initWindowResize('mainDataTable', true);
+	},
+	updated() {
+		tableHandler('mainDataTable', true);
+	},
+	destroyed() {
+		offWindowEvent('mainDataTable');
 	},
 	methods: {
 		getList() {

@@ -68,8 +68,8 @@ export default {
 	data() {
 		return {
 			typeMap: {
-				template: '选择模板',
-				edit: '编辑页面'
+				template: '自建页面',
+				edit: '自建页面'
 			},
 			orderKey: ['template', 'edit'],
 			orderMsg: ['选择模板', '编辑页面'],
@@ -197,6 +197,7 @@ export default {
 		next() {
 			Event.$off('template-save-result');
 			Event.$once('template-save-result', (data) => {
+			    console.log(data);
 				let index = this.orderKey.indexOf(this.config.type);
 				actions.controlDrawer(this.$store, {
 					show: true,

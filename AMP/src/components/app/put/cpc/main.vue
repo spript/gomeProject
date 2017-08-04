@@ -44,13 +44,9 @@ export default {
 	created(){
 		this.navMenu.map((item) => {
 			if(item.link !== 'javascript:void(0)'){
-			    console.log(item.link.substring(2, item.link.length));
-			    console.log(this.$route.path);
 				item.checked = item.link.substring(2, item.link.length) == this.$route.path;
 			}else{
 				item.sub.map((i,index) => {
-				    console.log(i.link.substring(2,i.link.length));
-				    console.log(this.$route.path);
 					if(i.link.substring(2,i.link.length) == this.$route.path){
 						item.checked = true;
 						return false;

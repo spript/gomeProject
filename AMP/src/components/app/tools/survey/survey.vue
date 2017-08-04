@@ -14,13 +14,8 @@
 		data() {
 			return {
 				breadcrumbConfig: {
-					data: [{
-						msg: '工具',
-						link: '/#/app/page',
-					}, {
-						msg: '调查问卷',
-						link:'/#/app/question/list',
-					}]
+					msg: '调查问卷',
+					showBack: false
 				}
 			};
 		},

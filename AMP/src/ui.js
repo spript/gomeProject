@@ -28,7 +28,8 @@ import {
 	Scrollbar,
 	CheckboxGroup,
 	Carousel,
-	CarouselItem
+	CarouselItem,
+	Tag
 } from 'element-ui';
 import VueAwesomeSwiper from 'vue-awesome-swiper';
 Vue.use(Button);
@@ -58,6 +59,7 @@ Vue.use(CheckboxGroup);
 Vue.use(Carousel);
 Vue.use(CarouselItem);
 Vue.use(VueAwesomeSwiper);
+Vue.use(Tag);
 let message = Message;
 
 Vue.prototype.$message = message;

@@ -57,41 +57,52 @@
 						</el-option>
 					</el-select>
 				</div>
+				<div class="fn-plan fn-plan-new"><span class="plan-title">跟单时效：</span>
+					<el-select v-model="orderDays" clearable style="width:130px;display:inline-block;" placeholder="全部">
+						<el-option label="15天" :value="15"></el-option>
+						<el-option label="当天" :value="1"></el-option>
+					</el-select>
+				</div>
 				<div class="fn-search"><a href="#" class="btn btn-primary" @click.prevent="search" style="width:130px">查询</a></div>
 				<div style="float:right;font-size:16px;letter-spacing:3px;position:absolute;bottom:0;right:0;"><a :href="exportExcel" style="margin-bottom:0px;display:block;"><em class="icon icon-report"></em>导出</a></div>
 				</div>
 			</div>
-			<div class="table-content">
-				<table class="table">
-					<thead>
-						<tr>
-							<th v-for="item in header" :width="120"><span>{{item}}</span></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="items in data">
-							<td v-for="item in items"><span>{{item}}</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<el-pagination v-show="Math.floor(page.totalCount/page.pageSize)>0"
-				@size-change="pageSizeChange"
-				@current-change="currentPageChange"
-				:current-page="page.currentPage"
-				:page-sizes="page.pageSizes"
-				:page-size="page.pageSize"
-				layout="total, sizes, prev, pager, next"
-				:total="page.totalCount"
-				:class="{'el-pagination-reset': true}"
-				>
-			</el-pagination>
 		</div>
+		<div class="amp-data">
+			<div class="data-table" id="mainDataTable">
+				<div class="main-table-wapper">
+					<table class="table main-table">
+						<thead>
+							<tr class="list-header">
+								<th v-for="item in header" :width="120"><span>{{item}}</span></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="body-row" v-for="items in data">
+								<td v-for="item in items"><span>{{item}}</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<el-pagination v-show="Math.floor(page.totalCount/page.pageSize)>0"
+			@size-change="pageSizeChange"
+			@current-change="currentPageChange"
+			:current-page="page.currentPage"
+			:page-sizes="page.pageSizes"
+			:page-size="page.pageSize"
+			layout="total, sizes, prev, pager, next"
+			:total="page.totalCount"
+			:class="{'el-pagination-reset': true}"
+			>
+		</el-pagination>
 	</div>
 </template>
 <script>
 import http from "../../../../utils/http";
 import apiConfig from '../../../../config/api.config.js';
+import {tableHandler, offWindowEvent, initWindowResize} from 'utils/table';
 export default {
 	name: "app-report-plan-material",
 	data() {
@@ -108,6 +119,7 @@ export default {
 			selectedDspFlightId: '',
 			materials: {},
 			selectedDspMaterialId:'',
+			orderDays:15,
 			page: {
 				totalCount: 0,
 				currentPage: 1,
@@ -144,16 +156,31 @@ export default {
 		this.getList();
 		this.getCampaignsAndFlightsAndMaterialsList();
 	},
+	mounted() {
+	    initWindowResize('mainDataTable', true, 4);
+	},
+    updated() {
+    	if (this.header.length) {
+    		tableHandler('mainDataTable', true, 4);
+    	}
+    },
+    destroyed() {
+        offWindowEvent('mainDataTable');
+    },
 	computed:{
-	  exportExcel:function() {
-	     let url = apiConfig[process.env.NODE_ENV]+'/api/report/anice/material/export';
-		 let startTime= this.formData.startTime ? new Date(this.formData.startTime).valueOf() : 0;
-		 let endTime= this.formData.endTime ? new Date(this.formData.endTime).valueOf() : 0;
-		 let campaignId = this.selectedDspCampaignId;
-		 let flightId= this.selectedDspFlightId;
-		 let materialId= this.selectedDspMaterialId;
-	     return url +'?productLine=2&startTime='+startTime+'&endTime='+endTime+'&campaignId='+campaignId+'&flightId='+flightId+'&materialId='+materialId;
-	  }
+		exportExcel:function() {
+			let url = apiConfig[process.env.NODE_ENV]+'/api/report/anice/material/export';
+			let startTime= this.formData.startTime ? new Date(this.formData.startTime).valueOf() : 0;
+			let endTime= this.formData.endTime ? new Date(this.formData.endTime).valueOf() : 0;
+			let campaignId = this.selectedDspCampaignId;
+			let flightId= this.selectedDspFlightId;
+			let materialId= this.selectedDspMaterialId;
+			let orderDays = this.orderDays;
+			let productLine = "2";
+			return url +'?productLine=2&startTime='+startTime+'&endTime='+endTime+
+				'&campaignId='+campaignId+'&flightId='+flightId+
+				'&materialId='+materialId+'&orderDays='+orderDays;
+		}
 	},
 	methods: {
 		getCampaignsAndFlightsAndMaterialsList(){
@@ -180,6 +207,7 @@ export default {
 					campaignId: this.selectedDspCampaignId,
 					flightId: this.selectedDspFlightId,
 					materialId: this.selectedDspMaterialId,
+					orderDays:this.orderDays,
 					productLine: "2"
 				}
 			})

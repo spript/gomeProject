@@ -40,13 +40,8 @@ export default {
 	data() {
 		return {
 			breadcrumbConfig: {
-				data: [{
-					msg: '我的账户',
-					link: '/#/app/account/'
-				}, {
-					msg: '联系方式',
-					link: '/#' + this.$route.path
-				}]
+				msg: '联系方式',
+				showBack: false
 			},
 			isLoadingFinish:false,
 			user:{

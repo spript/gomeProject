@@ -59,14 +59,14 @@ module.exports = {
 			test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
 			loader: 'url',
 			query: {
-				limit: 10000,
+				limit: 50000,
 				name: utils.assetsPath('img/[name].[hash:7].[ext]')
 			}
 		}, {
 			test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
 			loader: 'url',
 			query: {
-				limit: 10000,
+				limit: 50000,
 				name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
 			}
 		}]

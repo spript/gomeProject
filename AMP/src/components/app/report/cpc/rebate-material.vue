@@ -63,37 +63,42 @@
 				<div style="float:right;font-size:16px;letter-spacing:3px;position:absolute;bottom:0;right:0;"><a :href="exportExcel" style="margin-bottom:0px;display:block;"><em class="icon icon-report"></em>导出</a></div>
 				</div>
 			</div>
-			<div class="table-content">
-				<table class="table">
-					<thead>
-						<tr>
-							<th v-for="item in header" :width="120"><span>{{item}}</span></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="items in data">
-							<td v-for="item in items"><span>{{item}}</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<el-pagination v-show="Math.floor(page.totalCount/page.pageSize)>0"
-				@size-change="pageSizeChange"
-				@current-change="currentPageChange"
-				:current-page="page.currentPage"
-				:page-sizes="page.pageSizes"
-				:page-size="page.pageSize"
-				layout="total, sizes, prev, pager, next"
-				:total="page.totalCount"
-				:class="{'el-pagination-reset': true}"
-				>
-			</el-pagination>
 		</div>
+		<div class="amp-data">
+			<div class="data-table" id="mainDataTable">
+				<div class="main-table-wapper">
+					<table class="table main-table">
+						<thead>
+							<tr class="list-header">
+								<th v-for="item in header" :width="120"><span>{{item}}</span></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="body-row" v-for="items in data">
+								<td v-for="item in items"><span>{{item}}</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<el-pagination v-show="Math.floor(page.totalCount/page.pageSize)>0"
+			@size-change="pageSizeChange"
+			@current-change="currentPageChange"
+			:current-page="page.currentPage"
+			:page-sizes="page.pageSizes"
+			:page-size="page.pageSize"
+			layout="total, sizes, prev, pager, next"
+			:total="page.totalCount"
+			:class="{'el-pagination-reset': true}"
+			>
+		</el-pagination>
 	</div>
 </template>
 <script>
 import http from "../../../../utils/http";
 import apiConfig from '../../../../config/api.config.js';
+import {tableHandler, offWindowEvent, initWindowResize} from 'utils/table';
 export default {
 	name: "app-report-rebate-material",
 	data() {
@@ -145,6 +150,17 @@ export default {
 		this.getList();
 		this.getCampaignsAndFlightsAndMaterialsList();
 	},
+	mounted() {
+	    initWindowResize('mainDataTable', true, 4);
+	},
+    updated() {
+    	if (this.header.length) {
+    		tableHandler('mainDataTable', true, 4);
+    	}
+    },
+    destroyed() {
+        offWindowEvent('mainDataTable');
+    },
 	computed:{
 	  exportExcel:function() {
 	     let url = apiConfig[process.env.NODE_ENV]+'/api/report/rebate/material/export';

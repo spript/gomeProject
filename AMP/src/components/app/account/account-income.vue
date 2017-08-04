@@ -25,26 +25,30 @@
 					<div class="fn-search"><a href="#" class="btn btn-primary" @click.prevent="getList">查询</a></div>
 				</div>
 				<!-- 列表-->
-				<div class="cont-list scroll-x">
-					<table class="table">
-						<thead>
-							<tr>
-								<th :width="120"><span>充值日期</span></th>
-								<th :width="120"><span>名称</span></th>
-								<th :width="120"><span>状态</span></th>
-								<th :width="230"><span>流水单号</span></th>
-								<th :width="120"><span>金额(元)</span></th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr v-for="items in data">
-								<td v-for="(item, i) in items">
-									<span v-if=" i == 4">{{item.toFixed(2)}}</span>
-									<span v-else>{{item}}</span>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="amp-data">
+					<div class="data-table" id="mainDataTable">
+						<div class="main-table-wapper">
+							<table class="table main-table">
+								<thead>
+									<tr class="list-header">
+										<th :width="120"><span>充值日期</span></th>
+										<th :width="120"><span>名称</span></th>
+										<th :width="120"><span>状态</span></th>
+										<th :width="230"><span>流水单号</span></th>
+										<th :width="120"><span>金额(元)</span></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="items in data" class="body-row">
+										<td v-for="(item, i) in items">
+											<span v-if=" i == 4">{{item.toFixed(2)}}</span>
+											<span v-else>{{item}}</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</div>
 				<el-pagination v-show="Math.floor(page.totalCount/page.pageSize)>0"
 					@size-change="pageSizeChange"
@@ -62,6 +66,7 @@
 </template>
 <script type="text/javascript">
 import http from "http";
+import {tableHandler, offWindowEvent, initWindowResize} from 'utils/table';
 export default {
 	name: "app-account-income",
 	data(){
@@ -93,6 +98,15 @@ export default {
 	},
 	created(){
 		this.getList();
+	},
+	mounted() {
+		initWindowResize('mainDataTable', true);
+	},
+	updated() {
+		tableHandler('mainDataTable', true);
+	},
+	destroyed() {
+		offWindowEvent('mainDataTable');
 	},
 	methods: {
 		getList() {

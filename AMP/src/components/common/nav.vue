@@ -1,5 +1,6 @@
 <template>
 	<div class="content-menu">
+		<div v-show='routePath == "put" || routePath == "bidcpc"' class="content-menu-cpc">{{routePath=='put'?'定价CPC':(routePath=='bidcpc'?'竞价CPC':'')}}</div>
 		<ul>
 			<li v-for="(item, index) in routeConfig" @click="emitRoute(index)" :class="{'actived': item.checked}">
 				<div class="menu-header"><a :href="item.link" title=""><em v-if="item.sub.length" class="icon icon-arrow"></em><em class="icon" :class="item.icon"></em><span class="header-text">{{item.msg}}</span></a></div>
@@ -19,7 +20,8 @@ export default {
 	props: ['config'],
 	data() {
 		return {
-			routeConfig: []
+			routeConfig: [],
+			routePath: this.$route.path.split('/')[2]
 		};
 	},
 	mounted() {
@@ -55,3 +57,12 @@ export default {
 	}
 };
 </script>
+<style lang="less">
+	.content-menu-cpc{
+		background: #f0f3f6;
+		font-size: 16px;
+		line-height: 40px;
+		height: 40px;
+		padding-left: 40px;
+	}
+</style>

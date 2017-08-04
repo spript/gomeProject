@@ -140,7 +140,6 @@
 		isEmptyObj
 	} from 'utils/common';
 	import Sortable from 'sortablejs';
-
 	export default {
 	    name:'app-question-template',
 		props:['pageId'],
@@ -577,7 +576,7 @@
 		},
 	}
 </script>
-<style lang="less">
+<style lang="less" scoped>
 	.optionList li{
 		padding: 0;
 	}

@@ -49,18 +49,18 @@ export default [{
 			children: [{
 				path: 'list/:type', // 站内信
 				name: 'message-list',
-				component: require('../components/app/account/message-list.vue')
+				component: require('../components/app/account/messageList.vue')
 			},{
 				path: 'detail/:type/:id', // 站内信
 				name: 'message-detail',
-				component: require('../components/app/account/message-detail.vue')
+				component: require('../components/app/account/messageDetail.vue')
 			}]
 		}, {
 			path: 'balance', // 余额提醒
 			component: require('../components/app/account/balance.vue'),
 		}, {
-			path: 'business-aptitude', // 商家资质
-			component: require('../components/app/account/business-aptitude.vue'),
+			path: 'certificate', // 商家资质
+			component: require('../components/app/account/certificate.vue'),
 		}, {
 			path: 'ad-standard', // 广告审核规范
 			component: require('../components/app/account/ad-standard.vue'),

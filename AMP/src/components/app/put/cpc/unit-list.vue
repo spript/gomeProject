@@ -8,43 +8,46 @@
     </div>
     <div class="account-set">
       <div class="set-option">
-        <router-link to="/app/put/plan" class="btn btn-normal btn-back-up"><em class="icon icon-prev"></em>返回</router-link>
+        <!--<router-link to="/app/put/plan" class="btn btn-normal btn-back-up"><em class="icon icon-prev"></em>返回</router-link>-->
         <a href="" class="btn btn-normal" @click.prevent="newUnit">新建投放单元</a>
         <a href="" class="btn btn-normal" @click.prevent="start">启用</a>
         <a href="" class="btn btn-normal" @click.prevent="stop">暂停</a>
         <a href="" class="btn btn-normal" @click.prevent="del">删除</a>
+        <span class="set-option-hint" v-show='showOpationHint'>*请选择至少一项后，再进行操作。</span>
       </div>
       <div class="set-fn">
-        <div class="fn-plan"><span class="plan-title">单元名称：</span>
-          <div class="ele-input">
-            <input v-model="so.keyword" placeholder="请输入单元名称">
-          </div>
+      	<div style="float: left;width:975px;">
+	        <div class="fn-plan"><span class="plan-title">单元名称：</span>
+	          <div class="ele-input">
+	            <input v-model="so.keyword" placeholder="请输入单元名称">
+	          </div>
+	        </div>
+	        <el-form :model="so" :rules="rules" ref="formlist">
+	          <div class="fn-plan">
+	            <el-form-item prop="startTime" style="display:inline-block;">
+	              <span class="plan-title">选择时间：</span>
+	              <el-date-picker v-model="so.startTime" type="date" :editable="false" style="width:125px;" placeholder="开始日期">
+	              </el-date-picker>
+	              <span class="plan-title plan-title-gray">-</span>
+	              <el-date-picker v-model="so.endTime" type="date" :editable="false" style="width:125px;" placeholder="结束日期">
+	              </el-date-picker>
+	            </el-form-item>
+	          </div>
+	        </el-form>
+	        <div class="fn-plan"><span class="plan-title">状态：</span>
+	          <el-select v-model="so.state.value" style="width:100px;display:inline-block;" placeholder="全部">
+	            <el-option v-for="item in so.state.options" :label="item.label" :value="item.value">
+	            </el-option>
+	          </el-select>
+	        </div>
+	        <div class="fn-plan"><span class="plan-title">设备类型：</span>
+	          <el-select v-model="so.platform.value" style="width:100px;display:inline-block;" placeholder="全部">
+	            <el-option v-for="item in so.platform.options" :label="item.label" :value="item.value">
+	            </el-option>
+	          </el-select>
+	        </div>
         </div>
-        <el-form :model="so" :rules="rules" ref="formlist">
-          <div class="fn-plan">
-            <el-form-item prop="startTime" style="display:inline-block;">
-              <span class="plan-title">选择时间：</span>
-              <el-date-picker v-model="so.startTime" type="date" :editable="false" style="width:125px;" placeholder="开始日期">
-              </el-date-picker>
-              <span class="plan-title plan-title-gray">-</span>
-              <el-date-picker v-model="so.endTime" type="date" :editable="false" style="width:125px;" placeholder="结束日期">
-              </el-date-picker>
-            </el-form-item>
-          </div>
-        </el-form>
-        <div class="fn-plan"><span class="plan-title">状态：</span>
-          <el-select v-model="so.state.value" style="width:100px;display:inline-block;" placeholder="全部">
-            <el-option v-for="item in so.state.options" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <div class="fn-plan"><span class="plan-title">设备类型：</span>
-          <el-select v-model="so.platform.value" style="width:100px;display:inline-block;" placeholder="全部">
-            <el-option v-for="item in so.platform.options" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <div class="fn-search" @click.prevent="search"><a href="" class="btn btn-primary" style="width:76px;padding:0">查询</a></div>
+        <div style="float: left;" class="fn-search" @click.prevent="search"><a href="" class="btn btn-primary" style="width:76px;padding:0">查询</a></div>
       </div>
     </div>
     <div class="amp-data">
@@ -53,7 +56,8 @@
           <table class="table main-table">
             <thead>
               <tr :class="{actived: isActived, 'list-header': true}">
-                <th class="w100"><span><em class="icon icon-select  select-all" @click="checkall"></em><i class="data-id">单元ID</i></span></th>
+              	<th class="w50"><span><em class="icon icon-select  select-all" @click="checkall"></em></span></th>
+                <th class="w100"><span><i class="data-id">单元ID</i></span></th>
                 <th class="w220"><span>单元名称</span></th>
                 <th class="w120"><span>定向（地域|时间段）</span></th>
                 <th class="w100"><span>设备类型</span></th>
@@ -67,9 +71,13 @@
               </tr>
             </thead>
             <tbody>
+            	<tr class="body-row" v-if="list.length == 0">
+								<td colspan="12" style="text-align: center; height: 100px;line-height: 100px;">无相关查询结果</td>
+							</tr>
               <template v-for="item in list">
                 <tr :class="{actived: item.isActived, 'body-row': true}">
-                  <td><span><em @click="checkbox(item.flightId)" :class="'icon icon-select select-' + item.flightId" :data-id="item.flightId"></em><i class="data-id">{{item.flightId}}</i></span></td>
+                	<td><span><em @click="checkbox(item.flightId)" :class="'icon icon-select select-' + item.flightId" :data-id="item.flightId"></em></span></td>
+                  <td><span><i class="data-id">{{item.flightId}}</i></span></td>
                   <td>
                     <span>
                       <i class="ellipsis">
@@ -152,7 +160,7 @@
     <el-dialog :title="title" v-model="dialogVisible" size="tiny">
       <span v-html="body_html"></span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="dialogVisible = false" v-show='showCancel'>取 消</el-button>
         <el-button type="primary" @click="sureFn">确 定</el-button>
       </span>
     </el-dialog>
@@ -165,6 +173,9 @@ import Event from 'event';
 import CONST from '../../../../help/CONST.js';
 import Api from "../../../../config/api.config";
 import http from "../../../../utils/http";
+import {
+	copyObj
+} from 'utils/common';
 // import Dialog from "../../../common/dialog";
 import {formatDate,mixin} from 'utils/common';
 import {tableHandler, offWindowEvent, initWindowResize} from 'utils/table';
@@ -173,6 +184,8 @@ export default {
   name: 'app-put-unit-list-overview',
   data() {
     return {
+    	showCancel: true,
+    	showOpationHint: false,
       summary: {
         name: "",
         startTime: 0,
@@ -181,8 +194,8 @@ export default {
       },
       so: {
         keyword: "",
-        startTime: new Date(),
-        endTime: new Date(),
+        startTime: '',
+        endTime: '',
         state: {
           options: [{
             label: "全部",
@@ -221,7 +234,7 @@ export default {
         startTime: [{
           validator: (rule, value, callback) => {
             if(+this.so.endTime != 0 && +this.so.startTime > +this.so.endTime){
-              callback(new Error("结束时间不能早于开始时间"));
+              callback(new Error("开始时间不得晚于结束时间"));
             }else{
               callback();
             }
@@ -259,6 +272,55 @@ export default {
         break;
       }
       return isActived;
+    },
+    stopStates(){
+    	var states = this.selectedUnit,num;
+      if (states.length == 1) {
+      	if (states[0] == 1) {
+      		num = 1;//暂停
+      	} else {
+      		num = 2;//启用
+      	}
+      } else {
+      	for(let i = 0; i < states.length; i++) {
+	      	if (states[i] != 1) {
+	      		num = 3;//全是启用
+	      	} else {
+	      		num = 4;//混合
+	      		break;
+	      	}
+	      }
+      }
+      return num;
+    },
+    startDelStates(){
+    	var states = this.selectedUnit,num;
+      if (states.length == 1) {
+      	if (states[0] == 1) {
+      		num = 1;//暂停
+      	} else {
+      		num = 2;//启用
+      	}
+      } else {
+      	for(let i = 0; i < states.length; i++) {
+	      	if (states[i] == 1) {
+	      		num = 3;//全是暂停
+	      	} else {
+	      		num = 4;//混合
+	      		break;
+	      	}
+	      }
+      }
+      return num;
+    },
+    selectedUnit(){
+    	var states = [],list = this.list;
+      for(var item of list){
+        if(item.isActived){
+          states.push(item.state);
+        }
+      }
+      return states;
     }
   },
   created(){
@@ -273,10 +335,10 @@ export default {
     this.getList();
   },
   mounted() {
-    initWindowResize('mainDataTable', true);
+    initWindowResize('mainDataTable', true, 4);
   },
   updated() {
-    tableHandler('mainDataTable', true);
+    tableHandler('mainDataTable', true, 4);
   },
   destroyed() {
     offWindowEvent('mainDataTable');
@@ -450,124 +512,178 @@ export default {
         .catch(function(error) {
           alert("fail");
         });
+      } else if (this.btn_state == 'cancel') {
+      	this.dialogVisible=false;
       }
       this.dialogVisible=false;
+    },
+    toastChangeHint(condition, type) {
+    	var hintStr = '';
+    	if (condition == 1) {
+      	hintStr = type == 'start' ? `<h3>确定启动该投放单元吗？</h3>` : (type == 'stop' ? `<h3>仅“启动”状态的投放单元才可以暂停。</h3>` : (type == 'delete' ? `<h3>确定删除该投放单元吗？</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'start' : (type == 'stop' ? 'cancel' : (type == 'delete' ? 'delete' : ''));
+	      this.showCancel = type == 'start' ? true : (type == 'stop' ? false : (type == 'delete' ? true : ''));
+	  	} else if (condition == 2) {
+	      hintStr = type == 'start' ? `<h3>仅“暂停”状态的投放单元才可以启动。</h3>` : (type == 'stop' ? `<h3>确定暂停该投放单元吗？</h3>` : (type == 'delete' ? `<h3>仅“暂停”状态的投放单元才可以删除。</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'cancel' : (type == 'stop' ? 'stop' : (type == 'delete' ? 'cancel' : ''));
+	      this.showCancel = type == 'start' ? false : (type == 'stop' ? true : (type == 'delete' ? false : ''));
+	  	} else if (condition == 3) {
+  			hintStr = type == 'start' ? `<h3>已选择${this.flightIds.length}个投放单元，确定全部启动吗？</h3>` : (type == 'stop' ? `<h3>已选择${this.flightIds.length}个投放单元，确定全部暂停吗？</h3>` : (type == 'delete' ? `<h3>已选择${this.flightIds.length}个投放单元，确定全部删除吗？</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'start' : (type == 'stop' ? 'stop' : (type == 'delete' ? 'delete' : ''));
+	      this.showCancel = type == 'start' ? true : (type == 'stop' ? true : (type == 'delete' ? true : ''));
+	  	} else if (condition == 4) {
+  			hintStr = type == 'start' ? `<h3>已选择${this.flightIds.length}个投放单元，其中仅“暂停”状态的单元才可以启动。请重新选择。</h3>` : (type == 'stop' ? `<h3>已选择${this.flightIds.length}个投放单元，其中仅“启动”状态的单元才可以暂停。请重新选择。</h3>` : (type == 'delete' ? `<h3>已选择${this.flightIds.length}个投放单元，其中仅“暂停”状态的单元才可以删除。请重新选择。</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'cancel' : (type == 'stop' ? 'cancel' : (type == 'delete' ? 'cancel' : ''));
+	      this.showCancel = type == 'start' ? false : (type == 'stop' ? false : (type == 'delete' ? false : ''));
+	  	}
+	  	this.dialogVisible = true;
+			this.body_html = hintStr;
     },
     start(){
       var that = this, list = this.list;
       if(!this.flightIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.startDelStates, 'start');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定启动该投放单元吗？</h3>';
-      this.btn_state = 'start';
     },
     stop(){
       var that = this, list = this.list;
       if(!this.flightIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.stopStates, 'stop');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定暂停该投放单元吗？</h3>';
-      this.btn_state = 'stop';
     },
     del(){
       var that = this, list = this.list;
       if(!this.flightIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.startDelStates, 'delete');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定要删除该投放单元吗？</h3><p>(删除后信息将不在本列表展示，相关数据可在数据报表查看)</p>';
-      this.btn_state = 'delete';
     },
     newUnit() {
-      var id = this.$route.params.id, that = this;
-      http.get("/api/campaign", {
-        params:{
-          // campaignId: id
-          campaignId: that.campaignId
-        }
-      }).then(function(res){
-        if(res.data.code == 200){
-          actions.controlDrawer(that.$store, {
-            show: true,
-            action: 'new',
-            type: 'unit',
-            config: mixin(CONST.DRAWERUNIT, {
-              campaignId: that.campaignId
-            }),
-            isRebate: res.data.data.isRebate
-          });
-        }
-      })
-      .catch(function(error){
-        console.log(error);
-      });
+    	if (this.page.totalCount == 20) {
+    		this.showCancel = false;
+    		this.dialogVisible = true;
+      	this.body_html = '<h3>一个投放计划下最多可创建20个投放单元</h3>';
+      	this.btn_state = 'cancel';
+    	} else {
+    		var id = this.$route.params.id, that = this;
+	      http.get("/api/campaign", {
+	        params:{
+	          // campaignId: id
+	          campaignId: that.campaignId
+	        }
+	      }).then(function(res){
+	        if(res.data.code == 200){
+	          actions.controlDrawer(that.$store, {
+	            show: true,
+	            action: 'new',
+	            type: 'unit',
+	            config: mixin(CONST.DRAWERUNIT, {
+	              campaignId: that.campaignId
+	            }),
+	            isRebate: res.data.data.isRebate
+	          });
+	        }
+	      })
+	      .catch(function(error){
+	        console.log(error);
+	      });
+    	}
     },
     newIdea(id, flightType) {
       var that = this;
-      http.get("/api/campaign", {
-        params:{
-          // campaignId: this.$route.params.id
-          campaignId: that.campaignId
-        }
-      }).then(function(res){
-        if (res.data.code == 200) {
-          http.get("/api/flight/brief", {
-            params: {
-              flightId: id
-            }
-          }).then(function(flightRes){
-            if(flightRes.data.code == 200){
-              actions.controlDrawer(that.$store, {
-                show: true,
-                action: 'new',
-                type: 'idea',
-                config: mixin(CONST.DRAWERIDEA, {
-                  flightId: id,
-                  flightLinkType: flightRes.data.data.linkType,
-                  templateId: flightRes.data.data.templateId
-                }),
-                isRebate: res.data.data.isRebate
-              });
-            }
-          }).catch(function(error){
-            console.log(error);
-          });
-          /*
-          if (flightType == 1) {
-            //商品推广
-            actions.controlDrawer(that.$store, {
-              show: true,
-              action: 'new',
-              type: 'idea',
-              config: mixin({
-                flightId: id
-              }, CONST.DRAWERIDEA),
-              isRebate: res.data.data.isRebate
-            });
-          } else if (flightType == 2) {
-            //活动推广
-            actions.controlDrawer(that.$store, {
-              show: true,
-              action: 'new',
-              type: 'idea_url',
-              config: mixin({
-                flightId: id
-              }, CONST.DRAWERIDEA),
-              isRebate: res.data.data.isRebate
-            });
-          }*/
-        }
-      }).catch(function(error){
-        console.log(error);
-      });
+      http.get('/api/materials', {
+    		params: {
+    			flightId: id
+    		}
+    	})
+      .then((res) => {
+      	if (res.data.code == 200) {
+      		if (res.data.data.totalCount == 50) {
+      			this.showCancel = false;
+		    		this.dialogVisible = true;
+		      	this.body_html = '<h3>一个投放单元下最多可创建50个创意</h3>';
+		      	this.btn_state = 'cancel';
+      		} else {
+      			http.get("/api/campaign", {
+			        params:{
+			          // campaignId: this.$route.params.id
+			          campaignId: that.campaignId
+			        }
+			      }).then(function(res){
+			        if (res.data.code == 200) {
+			          http.get("/api/flight/brief", {
+			            params: {
+			              flightId: id
+			            }
+			          }).then(function(flightRes){
+			            if(flightRes.data.code == 200){
+			              actions.controlDrawer(that.$store, {
+			                show: true,
+			                action: 'new',
+			                type: 'idea',
+			                config: mixin(CONST.DRAWERIDEA, {
+			                  flightId: id,
+			                  flightLinkType: flightRes.data.data.linkType,
+			                  templateId: flightRes.data.data.templateId
+			                }),
+			                isRebate: res.data.data.isRebate
+			              });
+			            }
+			          }).catch(function(error){
+			            console.log(error);
+			          });
+			          /*
+			          if (flightType == 1) {
+			            //商品推广
+			            actions.controlDrawer(that.$store, {
+			              show: true,
+			              action: 'new',
+			              type: 'idea',
+			              config: mixin({
+			                flightId: id
+			              }, CONST.DRAWERIDEA),
+			              isRebate: res.data.data.isRebate
+			            });
+			          } else if (flightType == 2) {
+			            //活动推广
+			            actions.controlDrawer(that.$store, {
+			              show: true,
+			              action: 'new',
+			              type: 'idea_url',
+			              config: mixin({
+			                flightId: id
+			              }, CONST.DRAWERIDEA),
+			              isRebate: res.data.data.isRebate
+			            });
+			          }*/
+			        }
+			      }).catch(function(error){
+			        console.log(error);
+			      });
+      		}
+      	}
+      })
+      .catch((error) => {
+      	console.log(error);
+      })
     },
     modify(campaignId){
       this.getData(campaignId, "modify");
     },
     copy(campaignId){
-      this.getData(campaignId, "copy");
+      if (this.page.totalCount == 20) {
+    		this.showCancel = false;
+    		this.dialogVisible = true;
+      	this.body_html = '<h3>一个投放计划下最多可创建20个投放单元</h3>';
+      	this.btn_state = 'cancel';
+    	} else {
+    		this.getData(campaignId, "copy");
+    	}
     },
     getData(id, type){
       var that = this;
@@ -576,11 +692,34 @@ export default {
       })
       .then(function(res){
         if(res.data.code == 200){
-          var dataPackage = {
+            let data = res.data.data;
+			let times = [];
+			let days = [];
+			for (let i=0; i<24; i++) {
+				days.push({
+					sel:false,
+					mov:false,
+				})
+			}
+			for(let i=0; i<7; i++){
+				times.push({
+					on:false,
+					weeks:i,
+					time:copyObj(days)
+				})
+			}
+			let time = res.data.data.time;
+			for(let i = 0; i < times.length; i++) {
+				times[i].time.forEach((item,index) => {
+					item.sel = time[i+1].indexOf(index) > -1;
+				})
+			}
+			data.time = times;
+          let dataPackage = {
             show: true,
             action: type,
             type: 'unit',
-            config: res.data.data,
+            config: data,
             isRebate: res.data.data.isRebate
           };
           // if(res.data.data.isRebate){
@@ -617,6 +756,13 @@ export default {
         }
       }
     }
+  },
+  watch: {
+  	'flightIds' : function() {
+			if (this.flightIds.length) {
+				this.showOpationHint = false;
+			}
+		}
   }
 };
 </script>

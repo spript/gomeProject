@@ -1,7 +1,7 @@
 <template>
   <div>
     <m-breadcrumb :config="breadcrumbConfig"></m-breadcrumb>
-    <m-idea-list></m-idea-list>
+    <m-idea-list ref='data'></m-idea-list>
   </div>
 </template>
 <script>
@@ -11,23 +11,25 @@ export default {
   name: 'app-put-bidcpc-idea-overview',
   data() {
     return {
-      breadcrumbConfig: {
-        data: [{
-          msg: '投放管理',
-          link: '/#/app/bidcpc/'
-        }, {
-          msg: '投放计划',
-          link: '/#/app/bidcpc/plan'
-        }, {
-          msg: '投放单元',
-          link: '/#' + this.$route.path
-        }]
-      }
+      id: ''
     };
   },
   components: {
     'm-breadcrumb': Breadcrumb,
     'm-idea-list': unitList
-  }
+  },
+  computed: {
+		breadcrumbConfig() {
+			let breadcrumbConfig = {
+				msg: '创意',
+        link: '/#/app/bidcpc/unit/' + this.id,
+        showBack: true
+			};
+			return breadcrumbConfig;
+		}
+	},
+	mounted() {
+		this.id = this.$refs.data.campaignId;
+	}
 };
 </script>

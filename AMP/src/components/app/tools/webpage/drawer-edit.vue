@@ -4,539 +4,245 @@
 			<el-form  label-width="124px" :model="editData" ref="editData" :rules="rules">
 				<!--模板1 默认-->
 				<template v-if="editData.pageTemplateId == 1 || editData.pageTemplateId == 4">
-					<el-form-item label="名称：" >
-						<el-input  placeholder="请输入名称" style="width:400px;" v-model="editData.title"></el-input>
-				    </el-form-item>
-				    <el-form-item label="顶部大图：">
-						<div class="detail-row" style="width: 146px;margin: 0 20px 0 0;float: left;">
-							<div class="row-photo-s" @click="changeTopFile">
-								<input id="topPicture" type="file"
-									   style="width: 146px;height: 100px;display:block;position:absolute;visibility: hidden;"
-									   @change="topPictureChange" accept="image/jpg,image/jpeg,image/png">
-								<div class="photo-add photo-add-b"><img :src="imgUrl"></div>
-								<div class="el-upload__tip" style="color:red;text-align:center;width:150px;">
-									请上传宽高比例为2:1的图片
+					<template>
+						<el-row class="spliTitle">基本信息</el-row>
+						<el-form-item label="名称：" prop="title" >
+							<el-input  placeholder="请输入名称" style="width:400px;" v-model="editData.title"></el-input>
+							<div class="el-upload__tip" v-if="editData.pageTemplateId == 4">前端自适应屏幕大小，超过一行时，超出的部分前端会用省略号截断。</div>
+						</el-form-item>
+						<el-form-item label="顶部大图：" :rules="rules.topImg" ref="topImg">
+							<div class="detail-row">
+								<div class="photo-box">
+									<div class="btn btn-normal" @click="changeTopFile">上传图片</div>
+									<span>{{validateMsg.topImg.imgUrlName}}</span>
+									<div class="el-upload__tip" style="font-size:14px;color:#89919c;">仅支持宽高比为2:1的图片</div>
+									<input id="topPicture" type="file"
+										   style="display:none;position:absolute;"
+										   @change="topPictureChange" accept="image/jpg,image/jpeg,image/png">
+									<div class="photo-add" v-show="imgUrl !== undefined"><img :src="imgUrl"></div>
 								</div>
 							</div>
-						</div>
-					</el-form-item>
-					<el-form-item label="文案区：" prop="description">
-						<el-input type="textarea" v-model="editData.description" :autosize="{ minRows: 2, maxRows: 4}"
-								  placeholder="" style="width:400px;">
-						</el-input>
-					</el-form-item>
-				    <div v-for="index in 5">
-						<el-form-item label="SKU ID：">
-							<el-col :span="10" style="margin-right:30px;">
-								<el-input v-model="editData.itemList[(index * 2) - 2].skuId" placeholder="请输入SKU ID"
-										  @blur="queryItemId((index * 2) - 2)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[(index * 2) - 2].isError">
-									{{videoShopSKUList[(index * 2) - 2].errorMsg }}
-								</div>
-							</el-col>
-							<el-col :span="10">
-								<el-input v-model="editData.itemList[(index * 2) - 1].skuId" placeholder="请输入SKU ID"
-										  @blur="queryItemId((index * 2) - 1)"></el-input>
-								<div class="el-form-item__error error-left" v-if="videoShopSKUList[(index * 2) - 1].isError">
-									{{videoShopSKUList[(index * 2) - 1].errorMsg }}
-								</div>
-							</el-col>
+							<div class="SKUerror" v-if="validateMsg.topImg.isError">{{validateMsg.topImg.errorMsg}}</div>
 						</el-form-item>
-						<el-form-item label="商品区：">
-							<el-col :span="10" style="margin-right:30px;">
-								<img :src="editData.itemList[(index * 2) - 2].image"
-									 style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-							<el-col :span="10">
-								<img :src="editData.itemList[(index * 2) - 1].image"
-									 style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
+						<el-form-item label="文案区：" prop="description">
+							<el-input type="textarea" v-model="editData.description" :autosize="{ minRows: 2, maxRows: 4}"
+									  placeholder="" style="width:400px;">
+							</el-input>
 						</el-form-item>
-						<el-form-item label="广告文案：">
-							<el-col :span="10" style="margin-right:30px;">
-								<el-input type="textarea" v-model="editData.itemList[(index * 2) - 2].description"
-										  :autosize="{ minRows: 2, maxRows: 4}" placeholder=""></el-input>
-							</el-col>
-							<el-col :span="10">
-								<el-input type="textarea" v-model="editData.itemList[(index * 2) - 1].description"
-										  :autosize="{ minRows: 2, maxRows: 4}" placeholder=""></el-input>
-							</el-col>
+						<el-form-item label="页面背景色：" v-if="editData.pageTemplateId == 1">
+							<!--<el-input style="width:400px;" :readonly="true" v-model="selectColor" @focus="handlePalette"></el-input>-->
+							<div class="icon icon-selectColor" @click="handlePalette"></div>
+							<div :style="{background:selectColor,width:'20px',height:'20px',float: 'left', margin: '10px 0 0 10px'}" v-show="selectColor !== undefined"></div>
+							<sketch-picker v-model="colors" @input="onChange" v-if="showChildComponents.showPalette" :showPalette="showChildComponents.showPalette"></sketch-picker>
 						</el-form-item>
-					</div>
+					</template>
+					<template>
+						<el-row class="spliTitle">商品<span>必须添加10个商品</span></el-row>
+							<div class="SKUbox" v-for="index in 10">
+								<el-form-item label="SKU ID：" label-width="85px">
+									<el-input v-model="editData.itemList[index-1].skuId" placeholder="请输入SKU ID"
+											  @blur="queryItemId(index-1)"></el-input>
+									<div class="el-form-item__error" v-if="videoShopSKUList[index-1].isError">
+										{{videoShopSKUList[index-1].errorMsg }}
+									</div>
+								</el-form-item>
+								<el-form-item label="商品区：" label-width="85px">
+									<div v-if="!editData.itemList[index-1].image.length">
+										<span class="noImage">暂无图片</span>
+									</div>
+									<div v-else class="uploade-show uploade-select">
+										<m-image-scroll v-model="editData.itemList[index-1].images" :index="index-1"></m-image-scroll>
+									</div>
+								</el-form-item>
+								<el-form-item label="广告文案：" label-width="85px">
+									<el-input type="textarea" v-model="editData.itemList[index-1].description"
+											  resize="none" :rows= 4 ></el-input>
+								</el-form-item>
+							</div>
+						<div class="SKUerror" v-if="validateMsg.SKU.isSkuAll && SKUlen() < 10">{{validateMsg.SKU.errorMsg}}</div>
+					</template>
 				</template>
 				<!--模板2 店铺-->
 				<template v-if="editData.pageTemplateId == 2">
-					<el-form-item label="店铺ID：" prop="shopId">
+					<template>
+						<el-row class="spliTitle">基本信息</el-row>
+						<el-form-item label="店铺ID：" prop="shopId">
 						<el-input  placeholder="请输入店铺ID" style="width:400px;" v-model="editData.shopId"
 								   :disabled="shopIdReadOnly" id="shopIdReadOnly" @blur="shopIdChange">
 						</el-input>
 					</el-form-item>
-					<el-form-item label="店铺文案：" prop="description" :rules="rules.description">
+						<el-form-item label="店铺文案：" prop="description" :rules="rules.description">
 						<el-input type="textarea" v-model="editData.description"
 								  :autosize="{ minRows: 2, maxRows: 4}"
 								  placeholder="请输入店铺文案" style="width:400px;">
 						</el-input>
 					</el-form-item>
-					<p style="color: red; margin: 0 0 30px 125px;">SKU可输入的个数范围是4~10</p>
-					<template>
-						<el-form-item label="SKU ID：" style="width: 54%; display: inline-block; ">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[0].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(0)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[0].isError">{{ videoShopSKUList[0].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[1].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(1)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[1].isError">{{ videoShopSKUList[1].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品名称：" style="width: 54%; display: inline-block; "
-									  prop="itemList[0].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[0].name"  placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									   prop="itemList[1].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[1].name"   placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品区：">
-							<el-col :span="10" style="margin-right:30px;">
-								<img :src="editData.itemList[0].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-							<el-col :span="10">
-								<img :src="editData.itemList[1].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-						</el-form-item>
-						<el-form-item label="广告文案："  style="width: 54%; display: inline-block; "
-									  prop="itemList[0].description" :rules="rules.description">
-							<el-col :span="30" >
-								<el-input type="textarea" v-model="editData.itemList[0].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[1].description" :rules="rules.description">
-							<el-col :span="25">
-								<el-input type="textarea" v-model="editData.itemList[1].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
 					</template>
-					<template>
-						<el-form-item label="SKU ID：" style="width: 54%; display: inline-block; ">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[2].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(2)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[2].isError">{{ videoShopSKUList[2].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[3].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(3)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[3].isError">{{ videoShopSKUList[3].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品名称：" style="width: 54%; display: inline-block; "
-									  prop="itemList[2].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[2].name"  placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[3].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[3].name"   placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品区：">
-							<el-col :span="10" style="margin-right:30px;">
-								<img :src="editData.itemList[2].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-							<el-col :span="10">
-								<img :src="editData.itemList[3].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-						</el-form-item>
-						<el-form-item label="广告文案："  style="width: 54%; display: inline-block; "
-									  prop="itemList[2].description" :rules="rules.description">
-							<el-col :span="30" >
-								<el-input type="textarea" v-model="editData.itemList[2].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[3].description" :rules="rules.description">
-							<el-col :span="25">
-								<el-input type="textarea" v-model="editData.itemList[3].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-					</template>
-					<template v-if="shopSkuCount > 4">
-						<el-form-item label="SKU ID：" style="width: 54%; display: inline-block; ">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[4].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(4)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[4].isError">{{ videoShopSKUList[4].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[5].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(5)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[5].isError">{{ videoShopSKUList[5].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品名称：" style="width: 54%; display: inline-block; "
-									  prop="itemList[4].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[4].name"  placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[5].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[5].name"  placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品区：">
-							<el-col :span="10" style="margin-right:30px;">
-								<img :src="editData.itemList[4].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-							<el-col :span="10">
-								<img :src="editData.itemList[5].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-						</el-form-item>
-						<el-form-item label="广告文案："  style="width: 54%; display: inline-block; "
-									  prop="itemList[4].description" :rules="rules.description">
-							<el-col :span="30" >
-								<el-input type="textarea" v-model="editData.itemList[4].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[5].description" :rules="rules.description">
-							<el-col :span="25">
-								<el-input type="textarea" v-model="editData.itemList[5].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-					</template>
-					<template v-if="shopSkuCount > 6">
-						<el-form-item label="SKU ID：" style="width: 54%; display: inline-block; ">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[6].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(6)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[6].isError">{{ videoShopSKUList[6].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[7].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(7)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[7].isError">{{ videoShopSKUList[7].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品名称：" style="width: 54%; display: inline-block; "
-									  prop="itemList[6].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[6].name"  placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[7].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[7].name"   placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品区：">
-							<el-col :span="10" style="margin-right:30px;">
-								<img :src="editData.itemList[6].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-							<el-col :span="10">
-								<img :src="editData.itemList[7].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-						</el-form-item>
-						<el-form-item label="广告文案："  style="width: 54%; display: inline-block; "
-									  prop="itemList[6].description" :rules="rules.description">
-							<el-col :span="30" >
-								<el-input type="textarea" v-model="editData.itemList[6].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[7].description" :rules="rules.description">
-							<el-col :span="25">
-								<el-input type="textarea" v-model="editData.itemList[7].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-					</template>
-					<template v-if="shopSkuCount > 8">
-						<el-form-item label="SKU ID：" style="width: 54%; display: inline-block; ">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[8].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(8)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[8].isError">{{ videoShopSKUList[8].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[9].skuId" placeholder="请输入SKU ID" @blur="queryShopSKUId(9)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[9].isError">{{ videoShopSKUList[9].errorMsg }}</div>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品名称：" style="width: 54%; display: inline-block; "
-									  prop="itemList[8].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[8].name"  placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[9].name" :rules="rules.SKUname">
-							<el-col :span="25">
-								<el-input v-model="editData.itemList[9].name"   placeholder="请输入商品名称"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item label="商品区：">
-							<el-col :span="10" style="margin-right:30px;">
-								<img :src="editData.itemList[8].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-							<el-col :span="10">
-								<img :src="editData.itemList[9].image" style="width:185px;height:190px;margin-top:10px;border:0px;">
-							</el-col>
-						</el-form-item>
-						<el-form-item label="广告文案："  style="width: 54%; display: inline-block; "
-									  prop="itemList[8].description" :rules="rules.description">
-							<el-col :span="30" >
-								<el-input type="textarea" v-model="editData.itemList[8].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-						<el-form-item style="width: 54%;margin-left: -97px; display: inline-block;" class="skuIdRight"
-									  prop="itemList[9].description" :rules="rules.description">
-							<el-col :span="25">
-								<el-input type="textarea" v-model="editData.itemList[9].description"
-										  :autosize="{ minRows: 2, maxRows: 4}"
-										  placeholder="请输入广告文案"></el-input>
-							</el-col>
-						</el-form-item>
-					</template>
-					<el-form-item >
-						<div class="add-fn" v-show="shopSkuCount!==10"  @click="shopSkuCountAdd">
-							<span class="btn btn-normal"></span>
+				    <template>
+						<el-row class="spliTitle">商品<span>最少添加4个，最多添加10个</span></el-row>
+						<div class="SKUbox" v-for="(item,index) in editData.itemList">
+							<el-form-item label="SKU ID：" label-width="85px">
+								<el-input v-model="editData.itemList[index].skuId" placeholder="请输入SKU ID"
+										  @blur="queryShopSKUId(index)"></el-input>
+								<div class="el-form-item__error" v-if="videoShopSKUList[index].isError">
+									{{videoShopSKUList[index].errorMsg }}
+								</div>
+							</el-form-item>
+							<el-form-item label="商品区：" label-width="85px">
+								<div v-if="!editData.itemList[index].image.length">
+									<span class="noImage">暂无图片</span>
+								</div>
+								<div v-else class="uploade-show uploade-select">
+									<m-image-scroll v-model="editData.itemList[index].images" :index="index"></m-image-scroll>
+								</div>
+							</el-form-item>
+							<el-form-item label="广告文案：" label-width="85px">
+								<el-input type="textarea" v-model="editData.itemList[index].description"
+										  resize="none" :rows=4 placeholder=""></el-input>
+							</el-form-item>
 						</div>
-					</el-form-item>
+					</template>
+					<div class="btn btn-normal addbtn" @click="shopSkuCountAdd" v-show="editData.itemList.length!==10">新增商品</div>
+					<div class="SKUerror" v-if="validateMsg.SKU.isSkuAll && SKUlen() < 4">{{validateMsg.SKU.errorMsg}}</div>
 				</template>
 				<!--模板3 视频-->
 				<template v-if="editData.pageTemplateId == 3">
-					<el-form-item label="广告标题：" prop="title" :rules="rules.videoTitle" >
-						<el-input style="width:400px;" v-model="editData.title" placeholder="请输入广告标题"></el-input>
-					</el-form-item>
-					<el-form-item label="上传视频：" >
-						<div class="row-photo-s" style="width: 100%;">
-							<div id="flashContent">
-								<div id="flashPic">
+					<template>
+						<el-row class="spliTitle">基本信息</el-row>
+						<el-form-item label="广告标题：" prop="title" :rules="rules.videoTitle" >
+							<el-input style="width:400px;" v-model="editData.title" placeholder="请输入广告标题"></el-input>
+							<div class="el-upload__tip">前端自适应屏幕大小，超过一行时，超出的部分前端会用省略号截断。</div>
+						</el-form-item>
+						<el-form-item label="视频：" >
+							<div class="row-photo-s" style="width: 100%;">
+								<div id="flashContent">
+									<div id="flashPic"></div>
 								</div>
-							</div>
-							<input type="hidden" id="videoIds" v-model="editData.videoId">
-							<div id="progressBox" style="display: none"><progress id="progress" value="0" max="100"></progress></div>
-							<div class="el-form-item__error" id="videoIdsTip"></div>
-						</div>
-					</el-form-item>
-					<el-form-item label="封面图片：">
-						<el-radio-group v-model="editData.useDefaultImage" @change="videoImageTypeChange">
-							<el-radio :label="0">默认图片</el-radio>
-							<el-radio :label="1">自定义图片
-								<span v-if="editData.useDefaultImage == 1" >
-									<div @click="changeFile" style="display: inline-block;">
-										 <input id="videoImage" type="file"
-												accept="image/jpg,image/jpeg,image/png"
-												style="width: 68px; height: 28px;visibility: hidden; position: absolute; opacity: 0"
-												@change="videoImageChange">
-										<div class="imgupload" style="display: inline-block; margin-left: 10px" >点击上传</div>
-									</div>
-                                </span>
-							</el-radio>
-						</el-radio-group>
-						<div v-if="editData.useDefaultImage == 1">
-							<div class="row-photo-s">
-								<div class="el-upload__tip" style="width:100%">只能上传长宽比为2:1的图片文件</div>
-								<div class="photo-add photo-add-b">
-									<img :src="imgUrl" style="width: 400px; height: 247px;">
+								<span id="videoName" v-show="validateMsg.video.videoNameShow">{{validateMsg.video.videoName}}</span>
+								<input type="hidden" id="videoIds" v-model="editData.videoId">
+								<div id="progressBox" v-show="validateMsg.video.processShow">
+									<span>上传中</span>
+									<progress id="progress" :value="validateMsg.video.pro" max="100"></progress>
+									<span id="progressCode">{{validateMsg.video.proCode}}</span>
 								</div>
-							</div>
-						</div>
-					</el-form-item>
-					<el-form-item label="视频描述：" prop="description">
-						<el-input style="width:400px;" v-model="editData.description" type="textarea"
-								  :autosize="{ minRows: 2, maxRows: 4}"
-								  :rules = 'rules.description'
-								  placeholder="请输入视频描述"></el-input>
-					</el-form-item>
-					<el-form-item label="推广内容：">
-						<el-radio-group v-model="editData.promotionType" @change="promoteDetailChange">
-							<el-radio class="radio" v-model="editData.promoteDetail" :label="0" style="display: none">店铺</el-radio>
-							<el-radio class="radio" v-model="editData.promoteDetail" :label="2" style="margin-left: 0px">店铺</el-radio>
-							<el-radio class="radio" v-model="editData.promoteDetail" :label="1">商品</el-radio>
-						</el-radio-group>
-					</el-form-item>
-					<div v-if="editData.promotionType == 2">
-						<el-form-item label="店铺LOGO：" v-show="videoShopLogoShow">
-							<div>
-								<div class="photo-add photo-add-b">
-									<img v-model="editData.shopLogo" :src="editData.videoShopLogo"
-										 style="width:400px; height:247px;">
-								</div>
+								<div class="el-form-item__error" id="videoIdsTip" v-show="validateMsg.video.tip" v-html="validateMsg.video.tipMsg"></div>
+								<div class="el-form-item__error" v-show="validateMsg.video.isError">{{validateMsg.video.errorMsg}}</div>
 							</div>
 						</el-form-item>
-						<el-form-item label="店铺名称：" v-show="videoShopLogoShow">
-							<el-input style="width:400px;" v-model="editData.videoShopName" type="text"
-									  :disabled="shopIdReadOnly"></el-input>
+						<el-form-item label="封面图：">
+							<el-radio-group v-model="editData.useDefaultImage" @change="videoImageTypeChange">
+								<el-radio :label="0">默认图片</el-radio>
+								<el-radio :label="1">自定义图片
+									<span v-if="editData.useDefaultImage == 1" >
+										<div  style="display: inline-block;">
+											 <input id="videoImage" type="file"
+													accept="image/jpg,image/jpeg,image/png"
+													style="width: 68px; height: 28px;visibility: hidden; position: absolute; opacity: 0"
+													@change="videoImageChange">
+										</div>
+									</span>
+								</el-radio>
+							</el-radio-group>
+							<div v-if="editData.useDefaultImage == 1">
+								<div class="photo-box">
+									<div class="btn btn-normal" @click="changeFile">上传图片</div>
+									<span>{{validateMsg.topImg.imgUrlName}}</span>
+									<div class="el-upload__tip" style="width:100%">只能上传宽高比为2:1的图片</div>
+									<div class="photo-add" v-show="imgUrl !== undefined"><img :src="imgUrl"></div>
+								</div>
+								<div class="SKUerror" v-if="validateMsg.topImg.isError">{{validateMsg.topImg.errorMsg}}</div>
+							</div>
 						</el-form-item>
-						<el-form-item label="店铺ID：" v-show="videoShopIdShow" prop="shopId">
-							<el-input style="width:400px;" v-model="editData.shopId" type="text"
-									  placeholder="请输入店铺ID" id="shopId" @blur="videoShopId"></el-input>
-						</el-form-item>
-						<el-form-item label="店铺文案：" prop="videoShopDescription" :rules="rules.videoDescription">
-							<el-input style="width:400px;" v-model="editData.videoShopDescription" type="textarea"
+						<el-form-item label="视频描述：" prop="description">
+							<el-input style="width:400px;" v-model="editData.description" type="textarea"
 									  :autosize="{ minRows: 2, maxRows: 4}"
-									  placeholder="请输入店铺文案"></el-input>
+									  :rules = 'rules.description'
+									  placeholder="请输入视频描述"></el-input>
 						</el-form-item>
-					</div>
-					<div v-if="editData.promotionType == 1">
-						<el-row>
-							<el-form-item label="商品SKU：" prop="">
-								<el-input style="width:400px;" v-model="editData.itemList[0].skuId" type="text"
-										  placeholder="请输入商品SKU ID" @blur="queryVideoShopSKUId(0)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[0].isError">
-									{{videoShopSKUList[0].errorMsg }}
-								</div>
-							</el-form-item>
-							<el-form-item label="商品名称：" prop="itemList[0].name" :rules="rules.SKUname">
-								<el-input style="width:400px;" v-model="editData.itemList[0].name" type="text"
-										  placeholder="请输入商品名称"></el-input>
-							</el-form-item>
-							<el-form-item label="商品图片：" prop="" >
-									<div class="photo-add photo-add-b">
-										<img :src="editData.itemList[0].image" style="width: 400px; height: 274px;">
-									</div>
-
-									<!--<swiper :options="swiperOptions"  ref="mySwiperBig" >
-										<swiper-slide v-for='(item, index) in editData.itemList[0].image' :key="item.index" >
-											<img :src="item"/>
-										</swiper-slide>
-										<div class="swiper-button-prev"></div>
-										<div class="swiper-button-next"></div>
-									</swiper>-->
-
-								<!--<div class="photoBox">
-									<el-button class="scrollBtn" @click="photoNext(0)" v-show=" editData.itemList[0].image.length > 0 "
-									           :disabled="rightBtnDisabled"><</el-button>
-									<div class="photoContent">
-										<ul :style="{width: editData.itemList[0].image.length * 85 + 'px'}">
-											<li v-for="(item,index) in editData.itemList[0].image" class="photoContentLi">
-												<img :src="item">
-											</li>
-										</ul>
-									</div>
-									<el-button class="scrollBtn" @click="photoPrev(0)" v-show=" editData.itemList[0].image.length > 0 "
-											   :disabled="leftBtnDisabled"
-											   style="margin-left: 1%"><</el-button>
-								</div>-->
-							</el-form-item>
-							<el-form-item label="商品文案：" prop="itemList[0].description" :rules="rules.SKUname">
-								<el-input style="width:400px;" v-model="editData.itemList[0].description" type="textarea"
-										  placeholder="请输入商品文案"
-										  :autosize="{ minRows: 2, maxRows: 4}">
-								</el-input>
-							</el-form-item>
-						</el-row>
-						<el-row v-show='videoDesCount >= 2'>
-							<el-form-item  label="商品SKU：" prop="">
-								<el-input style="width:400px;" v-model="editData.itemList[1].skuId" type="text"
-										  placeholder="请输入商品SKU ID" @blur="queryVideoShopSKUId(1)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[1].isError">
-									{{videoShopSKUList[1].errorMsg }}
-								</div>
-							</el-form-item>
-							<el-form-item label="商品名称：" prop="itemList[1].name" :rules="rules.SKUname">
-								<el-input style="width:400px;" v-model="editData.itemList[1].name" type="text"
-										  placeholder="请输入商品名称"></el-input>
-							</el-form-item>
-							<el-form-item label="商品图片:" prop="">
-								<div class="row-photo-s">
-									<div class="photo-add photo-add-b">
-										<img :src="editData.itemList[1].image" style="width: 400px; height: 274px;">
-									</div>
-								</div>
-							</el-form-item>
-							<el-form-item label="商品文案：" prop="itemList[1].description" :rules="rules.SKUname">
-								<el-input style="width:400px;" v-model="editData.itemList[1].description" type="textarea"
-										  placeholder="请输入商品文案"
-										  :autosize="{ minRows: 2, maxRows: 4}">
-								</el-input>
-							</el-form-item>
-						</el-row>
-						<el-row v-show='videoDesCount >= 3'>
-							<el-form-item label="商品SKU：" prop="">
-								<el-input style="width:400px;" v-model="editData.itemList[2].skuId" type="text"
-										  placeholder="请输入商品SKU ID" @blur="queryVideoShopSKUId(2)"></el-input>
-								<div class="el-form-item__error" v-if="videoShopSKUList[2].isError">{{
-									videoShopSKUList[2].errorMsg }}
-								</div>
-							</el-form-item>
-							<el-form-item label="商品名称：" prop="itemList[2].name"  :rules="rules.SKUname">
-								<el-input style="width:400px;" v-model="editData.itemList[2].name" type="text" :maxlength="60"
-										  placeholder="请输入商品名称"></el-input>
-							</el-form-item>
-							<el-form-item label="商品图片：" prop="">
-								<div class="row-photo-s">
-									<div class="photo-add photo-add-b">
-										<img :src="editData.itemList[2].image" style="width: 400px; height: 274px;">
-									</div>
-								</div>
-							</el-form-item>
-							<el-form-item label="商品文案：" prop="itemList[2].description" :rules="rules.SKUname">
-								<el-input style="width:400px;" v-model="editData.itemList[2].description" type="textarea"
-										  placeholder="请输入商品文案"
-										  :autosize="{ minRows: 2, maxRows: 4}">
-								</el-input>
-							</el-form-item>
-						</el-row>
-						<el-form-item >
-							<div class="add-fn" v-show="videoDesCount !== 3" @click="addVideoDesCount">
-								<span class="btn btn-normal"></span>
-							</div>
+					</template>
+					<template>
+						<el-row class="spliTitle">推广内容</el-row>
+						<div class="SKUerror" v-if="validateMsg.promote.isError && editData.promotionType ==0">{{validateMsg.promote.errorMsg}}</div>
+						<el-form-item label="内容类型：" label-width="90px">
+							<el-radio-group v-model="editData.promotionType" @change="promoteDetailChange">
+								<el-radio class="radio" v-model="editData.promoteDetail" :label="0" style="display: none">店铺</el-radio>
+								<el-radio class="radio" v-model="editData.promoteDetail" :label="2" style="margin-left: 0px">店铺</el-radio>
+								<el-radio class="radio" v-model="editData.promoteDetail" :label="1">商品</el-radio>
+							</el-radio-group>
 						</el-form-item>
-					</div>
-				</template>
-				<el-form-item label="页面背景色：" v-if="editData.pageTemplateId == 1">
-					<el-input style="width:400px;" :readonly="true" v-model="selectColor" @focus="handlePalette"></el-input>
-					<sketch-picker v-model="colors" @input="onChange" v-if="showChildComponents.showPalette" :showPalette="showChildComponents.showPalette"></sketch-picker>
-				</el-form-item>
-				<el-form-item label="分享卡图片：" >
-					<div class="detail-row"  style="width: 146px;margin: 0 20px 0 0;float: left;">
-						<div class="row-photo-s" @click="changeShareFile">
-							<input id="sharePicture" type="file" style="width: 146px;height: 100px;display:block;position:absolute;visibility: hidden;" @change="sharePictureChange" accept="image/jpg,image/jpeg,image/png">
-							<div class="photo-add photo-add-b"><img :src="cardImg">
-							</div>
-							<div class="el-upload__tip" style="color:red;text-align:center;width:150px;">建议上传150*150的图片</div>
+						<div v-if="editData.promotionType == 2">
+							<el-form-item label="店铺ID：" v-show="videoShopIdShow" prop="shopId">
+								<el-input style="width:400px;" v-model="editData.shopId" type="text"
+										  placeholder="请输入店铺ID" id="shopId" @blur="videoShopId"></el-input>
+							</el-form-item>
+							<el-form-item label="店铺名称：" v-show="videoShopLogoShow">
+								<el-input style="width:400px;" v-model="editData.videoShopName" type="text"
+										  :disabled="shopIdReadOnly"></el-input>
+							</el-form-item>
+							<el-form-item label="店铺LOGO：" v-show="videoShopLogoShow">
+								<div>
+									<div class="photo-add photo-add-b">
+										<img v-model="editData.shopLogo" :src="editData.videoShopLogo"
+											 style="width:400px; height:247px;">
+									</div>
+								</div>
+							</el-form-item>
+							<el-form-item label="店铺文案：" prop="videoShopDescription" :rules="rules.videoDescription">
+								<el-input style="width:400px;" v-model="editData.videoShopDescription" type="textarea"
+										  :autosize="{ minRows: 2, maxRows: 4}"
+										  placeholder="请输入店铺文案"></el-input>
+							</el-form-item>
 						</div>
-					</div>
-				</el-form-item>
-				<el-form-item label="分享卡名称：">
-					<el-input style="width:400px;" v-model="editData.cardTitle"></el-input>
-				</el-form-item>
-				<el-form-item label="分享卡文案：">
-					<el-input type="textarea" v-model="editData.cardDescription" :autosize="{ minRows: 2, maxRows: 4}" placeholder="" style="width:400px;"></el-input>
-				</el-form-item>
+						<div v-if="editData.promotionType == 1">
+							<div class="SKUbox" v-for="(item,index) in editData.itemList">
+								<el-form-item label="SKU ID：" label-width="85px">
+									<el-input v-model="editData.itemList[index].skuId" placeholder="请输入SKU ID"
+											  @blur="queryVideoShopSKUId(index)"></el-input>
+									<div class="el-form-item__error" v-if="videoShopSKUList[index].isError">
+										{{videoShopSKUList[index].errorMsg }}
+									</div>
+								</el-form-item>
+								<el-form-item label="商品区：" label-width="85px">
+									<div v-if="!editData.itemList[index].image.length">
+										<span class="noImage">暂无图片</span>
+									</div>
+									<div v-else class="uploade-show uploade-select">
+										<m-image-scroll v-model="editData.itemList[index].images" :index="index"></m-image-scroll>
+									</div>
+								</el-form-item>
+								<el-form-item label="广告文案：" label-width="85px">
+									<el-input type="textarea" v-model="editData.itemList[index].description"
+											  resize="none" :rows="4" placeholder=""></el-input>
+								</el-form-item>
+							</div>
+							<div class="btn btn-normal addbtn" @click="addVideoDesCount" v-show="editData.itemList.length!==3">新增商品</div>
+							<div class="SKUerror" v-if="validateMsg.SKU.isSkuAll && SKUlen() == 0">{{validateMsg.SKU.errorMsg}}</div>
+						</div>
+					</template>
+				</template>
+				<template style="clear:both">
+					<el-row class="spliTitle">分享卡</el-row>
+					<el-form-item label="分享卡图片：" >
+						<div class="detail-row">
+							<div class="photo-box">
+								<div class="btn btn-normal" @click="changeShareFile">上传图片</div>
+								<span>{{validateMsg.cardImg.cardImgName}}</span>
+								<div class="el-upload__tip" style="font-size:14px;color:#89919c;">建议上传尺寸为150*150的图片</div>
+								<input id="sharePicture" type="file" style="display:none;position:absolute;"
+									   @change="sharePictureChange" accept="image/jpg,image/jpeg,image/png">
+								<div class="photo-add"  v-show="cardImg !== undefined"><img :src="cardImg"></div>
+							</div>
+						</div>
+						<div class="SKUerror" v-if="validateMsg.cardImg.isError && (cardImg == undefined || cardImg =='')">{{validateMsg.cardImg.errorMsg}}</div>
+					</el-form-item>
+					<el-form-item label="分享卡名称：" prop="cardTitle">
+						<el-input style="width:400px;" v-model="editData.cardTitle"></el-input>
+					</el-form-item>
+					<el-form-item label="分享卡文案：" prop="cardDescription" >
+						<el-input type="textarea" v-model="editData.cardDescription" :autosize="{ minRows: 2, maxRows: 4}"
+								   placeholder="" style="width:400px;"></el-input>
+					</el-form-item>
+				</template>
 			</el-form>
 		</div>
 	</div>
@@ -559,6 +265,7 @@ import {
 import Event from 'event';
 import Http from 'http';
 import { Sketch } from 'vue-color';
+import ImageScroll from '../../../common/imageScroll.vue';
 let defaultProps = {
 	hex: '#194d33',
 	hsl: {
@@ -587,9 +294,6 @@ export default {
 	props: ['pageId'],
 	data() {
 		return {
-		    isClickBtn:false,
-			rightBtnDisabled:true,
-			leftBtnDisabled:false,
 		    videoShopData:[],
 			videoShopLogoShow:true,
 			videoShopIdShow:false,
@@ -615,8 +319,40 @@ export default {
 				itemList: [],
 			},
 			editData: {
+		        imgUrl:'',
 				videoId: '0',
 				itemList: [],
+			},
+			validateMsg:{
+		        topImg:{
+					imgUrlName: '',
+		            isError:false,
+					errorMsg:''
+				},
+				SKU:{    //所有的图片
+					isSkuAll:false,
+					errorMsg:''
+				},
+				cardImg:{ //分享图片
+		            cardImgName:'',
+					isError:false,
+					errorMsg:''
+				},
+				video:{    //模板三-视频
+					videoName: '',
+					isError:false,
+					errorMsg:'',
+					tipMsg:'',
+					pro:0,
+					proCode:0,
+					tip:false,
+					processShow:false,
+					videoNameShow:false,
+				},
+				promote:{ //模板三-推广
+					isError:false,
+					errorMsg:''
+				}
 			},
 			imgUrl: '',
 			cardImg:'',
@@ -627,12 +363,51 @@ export default {
 			selectColor: "",
 			shopSkuCount:4,
 			rules:{
-		        'videoTitle':[{validator: function(rule, value, callback) {
-					if(limitLen(value, 30)){
-						callback();
-					}else{
-						callback(new Error('最大长度不超过15个汉字'));
-					}
+		        'shopId':[{
+					validator: function (rule, value, callback) {
+						if (value.trim() == '') {
+							callback(new Error('请输入店铺ID'));
+						}else {
+							callback();
+						}
+					}, trigger: 'blur'
+				}],
+		        'cardDescription':[{
+					validator: function (rule, value, callback) {
+						if (value.trim() == '') {
+							callback(new Error('请输入分享卡文案'));
+						}else {
+							callback();
+						}
+					}, trigger: 'blur'
+				}],
+		        'cardTitle':[{
+					validator: function (rule, value, callback) {
+						if (value.trim() == '') {
+							callback(new Error('请输入分享卡名称'));
+						}else {
+							callback();
+						}
+					}, trigger: 'blur'
+				}],
+				'title': [{
+					validator: function (rule, value, callback) {
+						if (value.trim() == '') {
+							callback(new Error('请输入名称'));
+						}else {
+						    callback();
+						}
+					}, trigger: 'blur'
+				}],
+		        'videoTitle':[{
+					validator: function (rule, value, callback) {
+						if (value.trim() == '') {
+							callback(new Error('请输入名称'))
+						} else if (!limitLen(value, 30)) {
+							callback(new Error('最大长度不超过15个汉字'));
+						} else {
+							callback();
+						}
 				}, trigger: 'blur' }],
 		        'videoDescription':[{validator: function(rule, value, callback) {
 					if(limitLen(value, 100)){
@@ -664,21 +439,27 @@ export default {
 		drawerCtrlAction: () => store.state.drawerCtrl.action
 	},
 	components: {
-		'sketch-picker': Sketch
+		'sketch-picker': Sketch,
+		'm-image-scroll': ImageScroll
 	},
 	created() {
 	    let itemList = {'itemList':[]};
+		let skus = [];
 		this.editData = copyObj(mixin(this.drawerData,itemList));
 		this.cardImg = this.editData.cardImage;
 		this.imgUrl = this.editData.image;
 		this.selectColor = this.editData.backgroundColor;
-		window.UploadVideoId = '0';
-		for (var i =0; i < 10; i++) {
-			let item = {skuId:'', image:[], productId: '', description:'' ,name:''};
+		let SKUlen = this.editData.pageTemplateId == 2 ? '4':(this.editData.pageTemplateId == 3 ? '1' : '10');
+		for (var i =0; i < SKUlen; i++) {
+			let item = {skuId:'', images:[], image:'',productId: '', description:'' ,name:''};
 			this.editData.itemList.push(item);
 		}
 		if (store.state.drawerCtrl.action === 'modify') {
 			if(this.editData.pageTemplateId == 3){ //视频
+				if(this.editData.videoId !== 0){
+					this.validateMsg.video.tip = true;
+					this.validateMsg.video.tipMsg = '<div class="icon icon-selecton" style="color:#1bb169;font-size: 14px;"> 上传成功！</div>';
+				}
 				if(this.editData.promotionType == 2 ){ //店铺
 					this.editData.shopId = this.editData.data[0].shopId
 					this.editData.videoShopLogo = this.editData.data[0].image;
@@ -749,29 +530,92 @@ export default {
 				}).catch(function (error) {
                      console.log(error);
 				});
-				this.editData.data.map((item,index)=>{
+				this.editData.data.forEach((item,index)=>{
+					skus.push(this.editData.data[index].skuId);
 					this.editData.itemList[index].skuId = this.editData.data[index].skuId;
 					this.editData.itemList[index].image = this.editData.data[index].image;
 					this.editData.itemList[index].productId = this.editData.data[index].productId;
 					this.editData.itemList[index].description = this.editData.data[index].description;
 					this.editData.itemList[index].name = this.editData.data[index].name;
-				})
+				});
 			}
 		}
+		this.getSkus(skus);
 		this.getShopId();
 	},
 	mounted() {
+	    window.addEventListener('click',() => {
+			this.showChildComponents.showPalette = false;
+		});
 		Event.$off('page-save');
 		Event.$on('page-save', (avg) =>{
-		    let RES = '';
+		    let RES = false;
 		    if(avg.publish == 'publish'){
 				this.$refs.editData.validate((result) => {
-					if (!result) {
-					    RES = result;
-					};
+					RES = result;
 				});
+				if(this.cardImg == undefined || this.cardImg == ''){
+					this.validateMsg.cardImg.isError = true;
+					this.validateMsg.cardImg.errorMsg = '请上传分享卡图片';
+				}else{
+					this.validateMsg.cardImg.isError = false;
+					this.validateMsg.cardImg.errorMsg = '';
+				}
+				if (this.editData.pageTemplateId == 1 || this.editData.pageTemplateId == 4) {
+				    if(this.SKUlen() < 10) {
+						this.validateMsg.SKU.isSkuAll = true;
+						this.validateMsg.SKU.errorMsg = 'SKU数量必须为10个'
+					}
+					if(this.imgUrl == undefined || this.imgUrl == '') {
+					    this.validateMsg.topImg.isError = true;
+					    this.validateMsg.topImg.errorMsg = '请上传图片';
+					}else{
+						this.validateMsg.topImg.isError = false;
+						this.validateMsg.topImg.errorMsg = '';
+					}
+				}else if(this.editData.pageTemplateId == 2) {
+					if(this.SKUlen() < 4) {
+						this.validateMsg.SKU.isSkuAll = true;
+						this.validateMsg.SKU.errorMsg = '至少添加4个SKU';
+					}else {
+						this.validateMsg.SKU.isSkuAll = false;
+						this.validateMsg.SKU.errorMsg = '';
+					}
+
+				}else if(this.editData.pageTemplateId == 3) {
+				    if(this.editData.videoId == '') {
+						this.validateMsg.video.isError = true;
+						this.validateMsg.video.errorMsg = '请上传视频';
+					}
+					if(this.editData.useDefaultImage ==1 && (this.imgUrl == undefined || this.imgUrl == '')) {
+						this.validateMsg.topImg.isError = true;
+						this.validateMsg.topImg.errorMsg = '请上传图片';
+					}else{
+						this.validateMsg.topImg.isError = false;
+						this.validateMsg.topImg.errorMsg = '';
+					}
+					if(this.editData.promotionType == 0) {
+				        this.validateMsg.promote.isError = true;
+				        this.validateMsg.promote.errorMsg = '请选择推广内容';
+					}
+					if(this.editData.promotionType == 1){
+						if(this.SKUlen() == 0) {
+							this.validateMsg.SKU.isSkuAll = true;
+							this.validateMsg.SKU.errorMsg = '至少添加1个SKU';
+						}else {
+							this.validateMsg.SKU.isSkuAll = false;
+							this.validateMsg.SKU.errorMsg = '';
+						}
+					}
+				}
+//				console.log(!RES);
+//				console.log(this.validateMsg.SKU.isSkuAll );
+//				console.log(this.validateMsg.topImg.isError );
+//				console.log(this.validateMsg.video.isError );
+//				console.log(this.validateMsg.promote.isError );
+//				console.log(!RES || this.validateMsg.SKU.isSkuAll || this.validateMsg.topImg.isError || this.validateMsg.video.isError || this.validateMsg.promote.isError);
+				if(!RES || this.validateMsg.SKU.isSkuAll || this.validateMsg.topImg.isError || this.validateMsg.video.isError || this.validateMsg.promote.isError)  return false;
 			};
-		    if(RES !== "" && RES == false)  return false;
 			if (avg.pId !== '' ) {
 				//修改
 				if (this.editData.pageTemplateId == 3) {
@@ -783,11 +627,7 @@ export default {
 							'description': this.editData.videoShopDescription,
 						}]
 					}
-					if (window.UploadVideoId !== '0') {
-						this.editData.videoId = window.UploadVideoId;
-					}
-				}
-				;
+				};
 				let params = {
 					videoId: this.editData.videoId, //视频ID
 					promotionType: this.editData.promotionType,//推广内容
@@ -839,16 +679,11 @@ export default {
 							'description': this.editData.videoShopDescription,
 						}]
 					}
-					if (window.UploadVideoId !== '0') {
-						this.editData.videoId = window.UploadVideoId;
-					} else {
-						this.editData.videoId = '0'
-					}
 				}
 				;
 				let params = {
 					//视频
-					videoId: this.editData.videoId, //视频ID
+					videoId: this.editData.videoId == '' ? 0 : this.editData.videoId, //视频ID
 					promotionType: this.editData.promotionType,//推广内容
 					useDefaultImage: this.editData.useDefaultImage, //0 默认 1自定义
 					pageTemplateId: this.editData.pageTemplateId,
@@ -926,72 +761,67 @@ export default {
 				+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif' alt='Get Adobe Flash player' target='_blank' /></a>";
 			uploadVideo();
 		}
+
+		Event.$off('startUploadVideo');
+		Event.$on('startUploadVideo', (data) => {
+            this.validateMsg.video.videoName = data.videoName;
+			this.validateMsg.videotip = false;
+			this.validateMsg.video.processShow = false;
+			this.validateMsg.video.videoNameShow = false;
+		})
+
+		Event.$off('uploadVideoProgress');
+		Event.$on('uploadVideoProgress', (data) => {
+			this.validateMsg.video.processShow = true;
+			this.validateMsg.video.pro = data.progress;
+			this.validateMsg.video.proCode = data.progress+'%';
+		});
+
+		Event.$off('uploadVideoSuccess');
+		Event.$on('uploadVideoSuccess', (data) => {
+			this.validateMsg.video.isError = false;
+			this.validateMsg.video.processShow = false;
+			this.validateMsg.video.videoNameShow = true;
+			this.validateMsg.video.tip = true;
+			this.validateMsg.video.tipMsg = '<div class="icon icon-selecton" style="color:#1bb169;font-size: 14px;"> 上传成功！</div>';
+			this.editData.videoId = data.videoId;
+		});
+
+		Event.$off('uploadVideoFail');
+		Event.$on('uploadVideoFail', (data) => {
+			this.validateMsg.video.isError = false;
+			this.validateMsg.video.processShow = false;
+			this.validateMsg.video.videoNameShow = true;
+			this.validateMsg.video.tip = true;
+			this.validateMsg.video.tipMsg = '<div class="icon icon-shut" style="color:#d30312;font-size: 14px;"> 上传失败！</div>';
+		})
+
 	},
 	methods: {
-		photoPrev(index){
-		    if(this.isClickBtn) return false;
-			this.isClickBtn = true;
-			let now = -7 * (50 + 5);
-		    let len = this.editData.itemList[index].image.length;
-		    let oUl = document.getElementsByClassName('photoContent')[index].getElementsByTagName('ul')[0];
-			let n = Math.floor((len * (50 + 5) + oUl.offsetLeft) / 50);
-			if (n <= 7) {
-				this.move(oUl, 'left', 0,index);
-			} else {
-				this.move(oUl, 'left', oUl.offsetLeft + now,index);
-			}
+		getSkus(skus) {
+			Http.get("/api/material/skus?skuIds=" + skus).then((res) => {
+			    res.data.data.skus.forEach((skus,i) => {
+					this.editData.itemList.forEach((items,index) => {
+						if(skus.skuId == items.skuId) {
+							skus.images.forEach((sku,j) => {
+								items.images.push({
+									url:sku,
+									checked:items.image == sku
+								})
+							})
+						}
+					})
+				})
+			}).catch(res => {
+				console.log(res);
+			})
 		},
-		photoNext(index){
-			if(this.isClickBtn) return false;
-			this.isClickBtn = true;
-			let len  = this.editData.itemList[index].image.length;
-			let oUl  = document.getElementsByClassName('photoContent')[index].getElementsByTagName('ul')[0];
-			let now1 = -Math.floor((len / 7) ) * 7 * (50 + 5);
-			let now  = 7 * (50 + 5);
-			if (oUl.offsetLeft >= 0) {
-				this.move(oUl, 'left', now1,index);
-			} else {
-				this.move(oUl, 'left', oUl.offsetLeft + now,index);
-			}
-		},
-	    move(obj, attr, iTarget,index){
-			clearInterval(obj.timer)
-			let vm = this;
-			let len  = this.editData.itemList[index].image.length;
-			let oUl  = document.getElementsByClassName('photoContent')[index].getElementsByTagName('ul')[0];
-			let now1 = -Math.floor((len / 7) ) * 7 * (50 + 5);
-			obj.timer = setInterval(function () {
-				let cur = 0;
-				cur = parseInt(vm.getStyle(obj, attr));
-				let speed = (iTarget - cur) / 6;
-				speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
-				if (iTarget == cur) {
-					clearInterval(obj.timer);
-					vm.isClickBtn = false;
-					if(oUl.offsetLeft == 0){
-						vm.rightBtnDisabled = true;
-					}else {
-						vm.rightBtnDisabled = false;
-					}
-					if( oUl.offsetLeft == now1){
-						vm.leftBtnDisabled = true;
-					}else{
-						vm.leftBtnDisabled = false;
-					}
-				} else {
-					obj.style[attr] = cur + speed + 'px';
-				}
-			}, 20);
-
-
-		},
-		getStyle(obj, name) {
-			if (obj.currentStyle) {
-				return obj.currentStyle[name];
-			}
-			else {
-				return getComputedStyle(obj, false)[name];
-			}
+		SKUlen() {
+			let SKUlen = 0;
+			this.editData.itemList.forEach((item) => {
+				if(item.skuId !== '') SKUlen ++ ;
+			})
+			return SKUlen;
 		},
 		videoShopId(){
 		    if(this.editData.shopId == '') {
@@ -1034,6 +864,8 @@ export default {
 				this.editData.itemList[index].image = '';
 				this.editData.itemList[index].productId = '';
 				this.editData.itemList[index].name = '';
+				this.videoShopSKUList[index].isError = true;
+				this.videoShopSKUList[index].errorMsg = '请输入SKU ID';
 				return;
 			} else{
 				let currentSku = this.editData.itemList.find((item,i) => {
@@ -1060,49 +892,46 @@ export default {
 					.then((res) => {
 						if (res.data.data.skuId == null  &&  res.data.data.productId == null ) {
 							this.editData.itemList[index].skuId = '';
-							this.$message({
-								message: '未找到该商品!',
-								type: 'error'
-							});
+							this.videoShopSKUList[index].isError = true;
+							this.videoShopSKUList[index].errorMsg = '未找到该商品';
 							return false;
 						} else if(this.editData.shopId !== "" && res.data.data.shopId !== this.editData.shopId ) {
 							this.editData.itemList[index].skuId = ''
 							this.editData.itemList[index].description = '';
 							this.editData.itemList[index].image = '';
 							this.editData.itemList[index].productId = '';
-							this.$message({
-								message: '请填写店铺内的SKU ID!',
-								type: 'warning'
-							});
+							this.videoShopSKUList[index].isError = true;
+							this.videoShopSKUList[index].errorMsg = '请填写店铺内的SKU ID';
 							return false;
 						}else{
 							this.editData.itemList[index].description = res.data.data.description;
-							this.editData.itemList[index].image = res.data.data.images[0];
 							this.editData.itemList[index].productId = res.data.data.productId;
 							this.editData.itemList[index].name = res.data.data.name;
+							this.videoShopSKUList[index].isError = false;
+							this.videoShopSKUList[index].errorMsg = '';
+							res.data.data.images.forEach((item) => {
+								this.editData.itemList[index].images.push({
+									url: item,
+									checked: false
+								});
+							});
+							this.editData.itemList[index].images[0].checked = true;
+							this.editData.itemList[index].image = this.editData.itemList[index].images[0].url;
 						}
 					});
 			}
 		},
 		videoImageTypeChange(){
-		    this.imgUrl = '';
+		    this.imgUrl = undefined;
+			this.validateMsg.topImg.isError = false;
+			this.validateMsg.topImg.errorMsg = '';
+			this.validateMsg.topImg.imgUrlName = '';
 		},
 		promoteDetailChange(obj){
 			this.videoDesCount = 1;
 			this.editData.itemList = [
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
-				{'skuId':'','image':'','description':'','name':''},
+				{skuId:'', images:[], image:'',productId: '', description:'' ,name:''}
 			];
-//			this.editData.videoShopDescription = '';
-//			this.editData.shopId = '';
 			  //2=>店铺 1=>商品
 			Http.get("/api/page/shop", {
 			    hideLoading:true
@@ -1132,7 +961,8 @@ export default {
 
 		},
 		addVideoDesCount(){
-			this.videoDesCount = this.videoDesCount === 3 ? this.videoDesCount : this.videoDesCount + 1;
+			let item = {skuId:'', images:[], image:'',productId: '', description:'' ,name:''};
+			this.editData.itemList.push(item);
 		},
 		changeFile() {
 			let input = document.getElementById("videoImage");
@@ -1144,10 +974,8 @@ export default {
 		},
 		loadVideoImage(file){
 			if (file.size > 500 *1024) {
-				this.$message({
-					message: '您上传的图片太大，请重新上传！',
-					type: 'warning'
-				});
+				this.validateMsg.topImg.isError = true;
+				this.validateMsg.topImg.errorMsg = '图片大小最大为500KB'
 				return false;
 			}
 			let that = this;
@@ -1163,13 +991,12 @@ export default {
 					let scale = width / height;
 					console.log(scale);
 					if(scale !== 2) {
-						that.$message({
-							message: '您上传的图片比例应该为2:1，请重新上传！',
-							type: 'warning'
-						});
+						that.validateMsg.topImg.isError = true;
+						that.validateMsg.topImg.errorMsg = '请上传宽高比例为2:1的图片'
 					} else {
 						imageData.append('file', file);
 						that.videoImageUpload(imageData);
+						that.validateMsg.topImg.imgUrlName = file.name;
 					}
 				};
 				image.src= data;
@@ -1221,7 +1048,8 @@ export default {
 				});
 		},
 		shopSkuCountAdd(){
-			this.shopSkuCount = this.shopSkuCount === 10 ? this.shopSkuCount : this.shopSkuCount + 2;
+			let item = {skuId:'', images:[], image:'',productId: '', description:'' ,name:''};
+			this.editData.itemList.push(item);
 		},
 		getShopId(){
 		    console.log();
@@ -1238,7 +1066,6 @@ export default {
 								this.imgUrl = res.data.data.icon;
 								this.editData.description = res.data.data.description;
 							}
-
 						}
 					})
 					.catch(function(error) {
@@ -1252,13 +1079,13 @@ export default {
 				this.editData.itemList[index].name = '';
 				this.editData.itemList[index].image = '';
 				this.editData.itemList[index].productId = '';
+				this.videoShopSKUList[index].isError = true;
+				this.videoShopSKUList[index].errorMsg = '请输入SKU ID';
 				return;
 			} else if(this.editData.shopId === "" || this.editData.shopId == undefined ){
 				this.editData.itemList[index].skuId = '';
-				this.$message({
-					message: '请先填写店铺ID!',
-					type: 'error'
-				});
+				this.videoShopSKUList[index].isError = true;
+				this.videoShopSKUList[index].errorMsg = '请先填写店铺ID';
 				return false;
 			} else{
 				let currentSku = this.editData.itemList.find((item,i) => {
@@ -1286,10 +1113,8 @@ export default {
 					.then((res) => {
 						if (res.data.data.skuId == null  &&  res.data.data.productId == null ) {
 							this.editData.itemList[index].skuId = '';
-							this.$message({
-								message: '未找到该商品!',
-								type: 'error'
-							});
+							this.videoShopSKUList[index].isError = true;
+							this.videoShopSKUList[index].errorMsg = '未找到该商品';
 							return false;
 						} else if(res.data.data.shopId !== this.editData.shopId){
 							this.editData.itemList[index].skuId = ''
@@ -1297,16 +1122,23 @@ export default {
 							this.editData.itemList[index].name = '';
 							this.editData.itemList[index].image= '';
 							this.editData.itemList[index].productId= '';
-							this.$message({
-								message: '请填写店铺内的SKU ID!',
-								type: 'warning'
-							});
+							this.videoShopSKUList[index].isError = true;
+							this.videoShopSKUList[index].errorMsg = '请填写店铺内的SKU ID';
 							return false;
 						}else{
 							this.editData.itemList[index].description = res.data.data.description;
 							this.editData.itemList[index].name = res.data.data.name;
-							this.editData.itemList[index].image = res.data.data.images[0];
 							this.editData.itemList[index].productId = res.data.data.productId;
+							this.videoShopSKUList[index].isError = false;
+							this.videoShopSKUList[index].errorMsg = '';
+							res.data.data.images.forEach((item) => {
+								this.editData.itemList[index].images.push({
+									url: item,
+									checked: false
+								});
+							});
+							this.editData.itemList[index].images[0].checked = true;
+							this.editData.itemList[index].image = this.editData.itemList[index].images[0].url;
 						}
 					});
 			}
@@ -1321,10 +1153,8 @@ export default {
 		},
 		loadTopFile(file) {
 			if (file.size > 500 *1024) {
-				this.$message({
-					message: '您上传的图片太大，请重新上传！',
-					type: 'warning'
-				});
+				this.validateMsg.topImg.isError = true;
+				this.validateMsg.topImg.errorMsg = '图片大小最大为500KB'
 				return false;
 			}
 			let that = this;
@@ -1338,15 +1168,15 @@ export default {
 					let width = image.width;
 					let height = image.height;
 					let scale = width / height;
-					console.log(scale);
 					if(scale !== 2) {
-						that.$message({
-							message: '您上传的图片比例应该为2:1，请重新上传！',
-							type: 'warning'
-						});
+						that.validateMsg.topImg.isError = true;
+						that.validateMsg.topImg.errorMsg = '请上传宽高比例为2:1的图片'
 					} else {
 						imageData.append('file', file);
 						that.imageTopUpload(imageData);
+						that.validateMsg.topImg.isError = false;
+						that.validateMsg.topImg.errorMsg = '';
+						that.validateMsg.topImg.imgUrlName = file.name;
 					}
 				};
 				image.src= data;
@@ -1365,7 +1195,8 @@ export default {
 			});
 		},
 
-		handlePalette() {
+		handlePalette(e) {
+		    e.stopPropagation();
 			this.showChildComponents.showPalette = true;
 		},
 		onChange(val) {
@@ -1384,10 +1215,8 @@ export default {
 		},
 		loadShareImage(file) {
 			if (file.size > 15 *1024) {
-				this.$message({
-					message: '您上传的图片太大，请重新上传！',
-					type: 'warning'
-				});
+				this.validateMsg.cardImg.isError = true;
+				this.validateMsg.cardImg.errorMsg = '图片大小最大为15KB';
 				return false;
 			}
 			let that = this;
@@ -1401,13 +1230,14 @@ export default {
 					let width = image.width;
 					let height = image.height;
 					if(width !== height) {
-						that.$message({
-							message: '您上传的图片比例应该为150*150，请重新上传！',
-							type: 'warning'
-						});
+						that.validateMsg.cardImg.isError = true;
+						that.validateMsg.cardImg.errorMsg = '请上传宽高比例为1:1的图片'
 					} else {
 						imageData.append('file', file);
 						that.shareImageUpload(imageData);
+						that.validateMsg.cardImg.cardImgName = file.name;
+						that.validateMsg.cardImg.isError = false;
+						that.validateMsg.cardImg.errorMsg = ''
 					}
 				};
 				image.src= data;
@@ -1431,6 +1261,8 @@ export default {
 				this.editData.itemList[index].image = '';
 				this.editData.itemList[index].productId = '';
 				this.editData.itemList[index].name = '';
+				this.videoShopSKUList[index].isError = true;
+				this.videoShopSKUList[index].errorMsg = '请输入SKU ID';
 				return;
 			} else {
 				let currentSku = this.editData.itemList.find((item,i) => {
@@ -1462,25 +1294,30 @@ export default {
 						this.editData.itemList[index].image= '';
 						this.editData.itemList[index].productId= '';
 						this.editData.itemList[index].name= '';
-						this.$message({
-							message: '未找到该商品!',
-							type: 'error'
-						});
+						this.videoShopSKUList[index].isError = true;
+						this.videoShopSKUList[index].errorMsg = '未找到该商品';
 						return false;
 					} else if(this.editData.shopId !== "" && res.data.data.shopId !== this.editData.shopId ){
 						this.editData.itemList[index].skuId = ''
 						this.editData.itemList[index].description = '';
 						this.editData.itemList[index].image = '';
 						this.editData.itemList[index].productId = '';
-						this.$message({
-							message: '请填写店铺内的SKU ID!',
-							type: 'warning'
-						});
+						this.videoShopSKUList[index].isError = true;
+						this.videoShopSKUList[index].errorMsg = '请填写店铺内的SKU ID';
 						return false;
 					}else{
 						this.editData.itemList[index].description = res.data.data.description;
-						this.editData.itemList[index].image = res.data.data.images[0];
 						this.editData.itemList[index].productId = res.data.data.productId;
+						this.videoShopSKUList[index].isError = false;
+						this.videoShopSKUList[index].errorMsg = '';
+						res.data.data.images.forEach((item) => {
+							this.editData.itemList[index].images.push({
+								url: item,
+								checked: false
+							});
+						});
+						this.editData.itemList[index].images[0].checked = true;
+						this.editData.itemList[index].image = this.editData.itemList[index].images[0].url;
 					}
 				});
 			}
@@ -1497,10 +1334,101 @@ export default {
 				this.cardImg = response.data.imageUrl;
 			}
 		},
+	},
+	watch:{
+		'editData.itemList': {
+			handler: function (value, oldvalue) {
+				value.forEach((items,i) => {
+					items.images.forEach((item, j) => {
+						if (item.checked) {
+							items.image = item.url;
+						}
+					})
+				})
+			},
+			deep: true
+		},
+		'selectColor': {
+		    handler: function(value,oldvalue) {
+				this.showChildComponents.showPalette = false;
+			},
+			deep: true
+		}
 	}
 };
 </script>
-<style scoped>
+<style scoped lang="less">
+	.vue-color__sketch{
+		margin: 40px 0 0 0;
+	}
+	.icon-selectColor{
+		float: left;
+		margin: 10px 0 0 10px;
+		&:hover{
+			 color:#d30312;
+		 }
+	}
+	.addbtn{
+		width:118px;
+		height:34px;
+		display: block;
+		margin: 20px 0;
+		clear: both;
+	}
+	.el-upload__tip{
+		line-height: 1.5;
+	}
+	.uploade-show{
+		padding-top: 0px;
+		width:290px;
+	}
+	.noImage{
+		display: block;
+		width:90px;
+		height:90px;
+		background:#ebeef1;
+		line-height: 90px;
+		border:1px solid #d9dbde;
+		box-sizing: border-box;
+		text-align: center;
+		color:#89919c;
+		font-size: 14px;
+		border-radius: 6px;
+	}
+	.amp-form03 {
+		padding: 0px 0px 0px 140px;
+		width:auto;
+	}
+	.SKUbox{
+		background:#f4f7f9;
+		width:405px;
+		padding: 20px 20px 20px 15px;
+		float: left;
+		margin: 0 10px 10px 0;
+	}
+	.SKUerror{
+		color: #ff4949;
+		margin-bottom: 10px;
+		clear:both;
+	}
+	.photo-box .photo-add{
+		width: 160px;
+		height: 80px;
+		img{
+			width: 100%;
+			height:100%;
+		}
+	}
+	.spliTitle{
+		font-size: 30px;
+		color:#3e4044;
+	    clear:both;
+		span{
+			color:#89919c;
+			font-size: 14px;
+			margin-left: 4px;
+		}
+	}
 	.photoContentLi{
 		float: left;
 		width: 50px;
@@ -1561,15 +1489,28 @@ export default {
 		border: none;
 	}
 	#progress {
-		width: 400px;
-		border: 1px solid #c0ccda;
-		background-color: #e6e6e6;
+		width: 125px;
+		background-color: #dfe3e6;
 		color: #d30312;
-		height: 7px;
+		height: 10px;
+		margin: 0 4px;
+		vertical-align: middle;
+		&::-webkit-progress-bar{
+			 background-color: #dfe3e6;
+		}
 	}
 	#progressBox{
-		height: 7px;
-		margin: -12px 0 20px 0;
+		width:262px;
+		height:44px;
+		background:#f4f7f9;
+		margin: 11px 0 20px 0;
+		padding:2px 20px;
+		span{
+			display: inline-block;
+			height: 44px;
+			line-height: 44px;
+		}
+
 	}
 	.error-left{
 		width:50%;

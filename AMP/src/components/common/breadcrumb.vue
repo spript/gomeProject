@@ -1,9 +1,7 @@
 <template>
-	<div class="crumbs">
-		<a v-for="(item, index) in config.data" :href="item.link">
-			<span :class="{'crumbs-acitved': index === config.data.length - 1}">{{item.msg}}</span>
-			<em v-show="index !== config.data.length - 1">{{config.sep || '>'}}</em>
-		</a>
+	<div class="crumbsUpdate">
+		<span>{{config.msg}}</span>
+		<a :href="config.link" v-show="config.showBack">返回</a>
 	</div>
 </template>
 <script>
@@ -12,3 +10,17 @@ export default {
 	props: ['config']
 };
 </script>
+<style lang="less">
+	.crumbsUpdate{
+		padding: 10px 0;
+		color: #1f252c;
+		span{
+			font-size: 18px;
+			line-height: 18px;
+			margin-right: 20px;
+		}
+		a{
+			font-size: 15px;
+		}
+	}
+</style>

@@ -1,9 +1,16 @@
 // uploadVideo();
+import Event from 'event';
 window.uploadVideo = () => {
 	let flashContent = document.getElementById('flashContent');
 	let swfVersionStr = "11.4.0";
 	let xiSwfUrlStr = "expressInstall.swf";
 	var flashvars = {
+		// env : "dev",
+		// appname : "h5",
+		// user_id : "1",
+		// description : "测试数据",
+		// tag : "视频,新闻,体育"
+		icon : 'http://10.112.178.90:8000/m/AMP/dist/static/img/T1C5AvBs_Q1RCvBVdK.png'
 	};
 	var params = {};
 	params.quality = "high";
@@ -18,7 +25,7 @@ window.uploadVideo = () => {
 	swfobject.embedSWF(
 		"https://js.meixincdn.com/gvs-player/dist/utils/video-upload.swf?t=" + new Date().getTime(),
 		"flashContent",
-		"100", "35",
+		"120", "40",
 		swfVersionStr, xiSwfUrlStr,
 		flashvars, params, attributes);
 	swfobject.createCSS(flashContent, "display:block;text-align:left;");
@@ -49,47 +56,47 @@ window.fileBrowse = () => {
 }
 //准备上传
 window.uploadPreparing = () => {
-	console.log('uploadPreparing');
-	var tip = document.getElementById('videoIdsTip');
-	tip.innerHTML='正在上传，请等待！';
+	console.log('准备上传');
+	if (window.isWebpage5) {
+		Event.$emit('preparingUploadVideo', {index: window.webpageUploadVideoIndex});
+	}
 };
 //上传视频开始
 window.startUpload = (data) => {
+	console.log('start');
+	if (window.isWebpage5) {
+		Event.$emit('startUploadVideo', {videoName: data.title, index: window.webpageUploadVideoIndex});
+	}else {
+		Event.$emit('startUploadVideo', {videoName: data.title});
+	}
 };
 
 //上传视频进度
 window.progress = (data) => {
-	console.log(data);
-	var progressBox = document.getElementById('progressBox');
-	var progress = document.getElementById('progress');
-	progressBox.style.display='block';
-	progress.value = Math.round(data.bytesLoaded/data.bytesTotal*100);
-	if(progress.value == 100){
-		setTimeout(() => {
-			progressBox.style.display='none';
-		},5000)
+	var cProgress = Math.round(data.bytesLoaded / data.bytesTotal * 100);
+	console.log('procecss');
+	if (window.isWebpage5) {
+		Event.$emit('uploadVideoProgress', {progress: cProgress, index: window.webpageUploadVideoIndex});
+	} else {
+		Event.$emit('uploadVideoProgress', {progress: cProgress});
 	}
+
 };
 
 //上传视频结束
 window.uploadComplete = (data) => {
-	console.log("uploadComplete videoId : " + data.videoId);
-	window.UploadVideoId = data.videoId;
-	var tip = document.getElementById('videoIdsTip');
-	setTimeout(() => {
-		tip.innerHTML='上传成功！';
-	},1000);
-	setTimeout(() => {
-		tip.innerHTML = '';
-	},5000);
+	if (window.isWebpage5) {
+		Event.$emit('uploadVideoSuccess', {index: window.webpageUploadVideoIndex, videoId: data.videoId});
+	} else {
+		Event.$emit('uploadVideoSuccess', {videoId: data.videoId});
+	}
 };
 window.error = (data) => {
-	var tip = document.getElementById('videoIdsTip');
-	tip.innerHTML='上传失败，请重新上传！'
-	setTimeout(function(){
-		tip.innerHTML = '';
-	},5000)
-
+	if (window.isWebpage5) {
+		Event.$emit('uploadVideoFail', {index: window.webpageUploadVideoIndex});
+	} else {
+		Event.$emit('uploadVideoFail');
+	}
 };
 window.thisFlash = (flashName) => {
 	if (navigator.appName.indexOf("Microsoft") != -1) {

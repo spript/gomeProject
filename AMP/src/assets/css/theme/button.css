@@ -197,26 +197,26 @@
 
 .el-button--primary{
     color: #fff;
-    background-color: #20a0ff;
-    border-color: #20a0ff;
+    background-color: #d30312;
+    border-color: #d30312;
 }
 
 .el-button--primary:hover, .el-button--primary:focus{
-    background: rgb(77, 179, 255);
-    border-color: rgb(77, 179, 255);
+    background: rgb(231, 11, 27);
+    border-color: rgb(231, 11, 27);
     color: #fff;
 }
 
 .el-button--primary:active{
-    background: rgb(29, 144, 230);
-    border-color: rgb(29, 144, 230);
+    background: rgb(211, 3, 18);
+    border-color: rgb(211, 3, 18);
     color: #fff;
     outline: none;
 }
 
 .el-button--primary.is-active{
-    background: rgb(29, 144, 230);
-    border-color: rgb(29, 144, 230);
+    background: rgb(211, 3, 18);
+    border-color: rgb(211, 3, 18);
     color: #fff;
 }
 

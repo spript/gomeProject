@@ -11,13 +11,13 @@
 						<el-radio :label="0">不连续投放</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				<el-form-item label="" v-if="formData.isContinuous">
+				<el-form-item label="" v-if="formData.isContinuous" label-width="140px">
 					<el-radio-group v-model="formData.isUnlimited">
 						<el-radio :label="0">设定结束时间</el-radio>
 						<el-radio :label="1">不限结束时间</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				<el-form-item label="" v-if="formData.isContinuous" prop="startTime">
+				<el-form-item label="" v-if="formData.isContinuous" prop="startTime" label-width="140px">
 					<el-col :span="11">
 						<el-row>
 							<el-col :span="7">
@@ -53,23 +53,25 @@
 								<el-date-picker :picker-options="pickerOptions" type="daterange" placeholder="请选择时间" size="mini" :editable="false" v-model="noContinuousDate" style="width: 14px;height: 14px;position: absolute;left: 0;top: 13px;opacity: 0;"></el-date-picker>
 							</span>
 						</div>
-						<div class="setting-list">
+						<div class="setting-list" style="position: relative;">
 							<ul>
-								<li v-for="(item, index) in scheduleList" :class="{'error': dayErrorIndex.indexOf(index) !== -1}">
+								<li v-for="(item, index) in scheduleList">
 									<span>{{item}}</span>
 									<i @click="delSchedule(index)" style="cursor: pointer;font-size: 12px;margin-left: 80px;" class="el-icon-close"></i>
 								</li>
 							</ul>
+							<div class="hintSelectTime" v-show='showHintSelectTime'>请选择投放时间段</div>
 						</div>
 					</div>
 				</el-form-item>
 				<el-form-item label="计费方式：">
-					<el-radio-group v-model="formData.saleMode">
-						<!-- <el-radio :label="1">CPM</el-radio> -->
+					<!--<el-radio-group v-model="formData.saleMode">
+						&lt;!&ndash; <el-radio :label="1">CPM</el-radio> &ndash;&gt;
 						<el-radio :label="3">CPC</el-radio>
-					</el-radio-group>
+					</el-radio-group>-->
+					CPC（定价）
 				</el-form-item>
-				<el-form-item label="广告日预算：" prop="dailyAdBudget">
+				<el-form-item label="广告日预算：" prop="dailyAdBudget" class="daliyRebate">
 					<el-row>
 						<el-col :span="7">
 							<el-radio-group style="vertical-align: middle;" v-model="formData.adLimited">
@@ -77,8 +79,8 @@
 								<el-radio :label="1">自定义</el-radio>
 							</el-radio-group>
 						</el-col>
-						<el-col :span="14">
-							<el-input :disabled="formData.adLimited === 0" :placeholder="formData.adLimited === 0 ? '不限预算' : ''" v-model.number="formData.adLimited === 0 ? '' : formData.dailyAdBudget" style="widht: 100%"></el-input>
+						<el-col :span="14" prop="adLimited">
+							<el-input :disabled="formData.adLimited === 0" v-filterNum :placeholder="formData.adLimited === 0 ? '不限预算' : ''" v-model.number="formData.adLimited === 0 ? '' : formData.dailyAdBudget" style="widht: 100%"></el-input>
 						</el-col>
 						<el-col :span="2">
 							<span style="margin-left: 6px;">元/天</span>
@@ -95,10 +97,11 @@
 						</el-col>
 					</el-row>
 				</el-form-item>
+				<el-row class="el-upload__tip" v-if="drawerCtrlAction == 'modify'">修改后广告日预算第二天生效</el-row>
 				<el-form-item label="返利活动：">
 					<el-switch on-text="" off-text="" v-model="isRebate" @change="customIsRebate"></el-switch>
 				</el-form-item>
-				<el-form-item label="返利日预算：" prop="dailyRebateBudget" v-show="isRebate">
+				<el-form-item label="返利日预算：" prop="dailyRebateBudget" v-show="isRebate" class="daliyRebate">
 					<el-row>
 						<el-col :span="7">
 							<el-radio-group style="vertical-align: middle;" v-model="formData.rebateLimited">
@@ -107,7 +110,7 @@
 							</el-radio-group>
 						</el-col>
 						<el-col :span="14">
-							<el-input :disabled="formData.rebateLimited === 0" :placeholder="formData.rebateLimited === 0 ? '不限预算' : ''" v-model.number="formData.rebateLimited === 0 ? '' : formData.dailyRebateBudget" style="widht: 100%"></el-input>
+							<el-input :disabled="formData.rebateLimited === 0"  v-filterNumDaily :placeholder="formData.rebateLimited === 0 ? '不限预算' : ''" v-model.number="formData.rebateLimited === 0 ? '' : formData.dailyRebateBudget" style="widht: 100%"></el-input>
 						</el-col>
 						<el-col :span="2">
 							<span style="margin-left: 6px;">元/天</span>
@@ -122,29 +125,57 @@
 								<em class="icon icon-help"></em>
 							</el-tooltip> -->
 						</el-col>
+
 					</el-row>
 				</el-form-item>
+				<el-row class="el-upload__tip" v-if="drawerCtrlAction == 'modify'">修改后返利日预算第二天生效</el-row>
 			</el-form>
 		</div>
 	</div>
 </template>
 <script>
+import Vue from 'vue';
 import store from 'store';
 import {
 	copyObj,
 	objType,
 	formatDate,
 	mixin,
-	formatTimeByUnit
+	formatTimeByUnit,
+	limitLen
 } from 'utils/common';
 
 import Event from 'event';
 import Http from 'http';
 
+var _THIS = '';
+Vue.directive('filterNum', {
+	bind: function(el) {
+		const Input = el.getElementsByTagName('input')[0];
+		Input.addEventListener('input',function(e){
+			let val = Input.value.replace(/[^0-9]+/, "");
+			Input.value = val;
+			_THIS.formData.dailyAdBudget = Number(val);
+		});
+	}
+});
+
+Vue.directive('filterNumDaily', {
+	bind: function(el) {
+		const Input = el.getElementsByTagName('input')[0];
+		Input.addEventListener('input',function(e){
+			let val = Input.value.replace(/[^0-9]+/, "");
+			Input.value = val;
+			_THIS.formData.dailyRebateBudget = Number(val);
+		});
+	}
+});
+
 export default {
 	name: 'app-put-new-plan',
 	data() {
 		return {
+			showHintSelectTime: false,
 			formData: {},
 			pickerOptions: {
 	          	disabledDate(time) {
@@ -152,46 +183,73 @@ export default {
 	          	}
 	        },
 			rules: {
-				name: [{
-					required: true,
-					message: '请输入计划名称',
-					trigger: 'blur'
-				}, {
-					max: 30,
-					message: '最大长度不超过30个汉字',
-					trigger: 'blur'
-				}],
+				'name':[{validator: (rule, value, callback) => {
+					if (!limitLen(value, 60)) {
+						callback(new Error('字数不超过30个汉字'));
+					} else if (value.trim() == '') {
+						callback(new Error('请输入投放计划名称'));
+					} else {
+						Http.get('/api/campaign/exist', {
+							params: {
+								name: value,
+								productLine: 2,
+								campaignId: this.formData.campaignId
+							}
+						})
+						.then((res) => {
+							if (res.data.code == 200) {
+								if (res.data.data.exist == 1) {
+									callback(new Error('投放计划名称已存在'));
+								} else {
+									callback();
+								}
+							}
+						})
+						.catch((error) => {
+							console.log(error);
+						})
+					}
+				}, trigger: 'blur' }],
 				dailyAdBudget: [{
-					validator: function(rule, value, callback) {
-						if (value === '') {
-							callback(new Error('请填写广告日预算'));
-						} else if (objType(value) !== 'Number') {
-							callback(new Error('只能为数字'));
-						} else if (value < 0) {
-							callback(new Error('不能为负数'));
-						} else if (value > 99999999) {
-							callback(new Error('最大值不超过99,999,999.00'));
-						} else if (/\.(.*)/.test(value.toString()) ? value.toString().match(/\.(.*)/)[1].length > 2 : false) {
-							callback(new Error('只能两位小数'));
-						} else {
+					validator: (rule, value, callback) =>  {
+					    if(this.formData.adLimited == 1) {
+							if (value === '') {
+								callback(new Error('请输入广告日预算'));
+							}  else if (value < 0) {
+								callback(new Error('不能为负数'));
+							} else if (value > 99999999) {
+								callback(new Error('广告日预算最大值不超过99999999.00'));
+							} else if (value < 0.01) {
+								callback(new Error('广告日预算最小不小于0.01'));
+							} else if (/\.(.*)/.test(value.toString()) ? value.toString().match(/\.(.*)/)[1].length > 2 : false) {
+								callback(new Error('只能两位小数'));
+							} else {
+								callback();
+							}
+						}else{
 							callback();
-        				}
+						}
 					},
 					trigger: 'change'
 				}],
 				dailyRebateBudget: [{
-					validator: function(rule, value, callback) {
-						if (value === '') {
-							callback(new Error('请填写返利日预算'));
-						} else if (objType(value) !== 'Number') {
-							callback(new Error('只能为数字'));
-						} else if (value < 0) {
-							callback(new Error('不能为负数'));
-						} else if (value > 99999999) {
-							callback(new Error('最大值不超过99,999,999.00'));
-						}  else if (/\.(.*)/.test(value.toString()) ? value.toString().match(/\.(.*)/)[1].length > 2 : false) {
-							callback(new Error('只能两位小数'));
-						} else {
+					validator: (rule, value, callback) =>  {
+						if(this.formData.rebateLimited == 1 && this.formData.isRebate == 1) {
+							console.log(value);
+							if (value === '') {
+								callback(new Error('请输入返利日预算'));
+							}  else if (value < 0) {
+								callback(new Error('不能为负数'));
+							} else if (value > 99999999) {
+								callback(new Error('返利日预算最大值不超过99999999.00'));
+							} else if (value < 0.01) {
+								callback(new Error('返利日预算最小不小于0.01'));
+							} else if (/\.(.*)/.test(value.toString()) ? value.toString().match(/\.(.*)/)[1].length > 2 : false) {
+								callback(new Error('只能两位小数'));
+							} else {
+								callback();
+							}
+						}else {
 							callback();
 						}
 					},
@@ -252,32 +310,6 @@ export default {
 			});
 			return len;
 		},
-		dayErrorIndex: function() {
-			let timeObjArray = [];
-			this.formData.schedule.forEach((item, index) => {
-//				let cur = item.split('-');
-				let cur = item;
-				timeObjArray.push({
-					start: Number(cur[0]),
-					end: Number(cur[1]),
-					index: index
-				});
-			});
-			timeObjArray.sort(function(a, b) {
-				return a.start - b.start;
-			});
-			for(let i = 1; i < timeObjArray.length; i++) {
-				if (timeObjArray[i].start < timeObjArray[i -1].end) {
-					this.$message({
-						message: '存在重复时间段',
-						type: 'error',
-						duration: 3000
-					});
-					return [timeObjArray[i].index, timeObjArray[i - 1].index];
-				}
-			}
-			return [];
-		}
 	},
 	created() {
 		this.formData = copyObj(this.drawerData);
@@ -286,6 +318,7 @@ export default {
 		this.formData.dailyAdBudget = this.formData.dailyAdBudget / 100;
 		this.startTime = this.formData.startTime || Date.now();
 		this.endTime = this.formData.endTime || Date.now();
+		_THIS = this;
 	},
 	mounted() {
 		Event.$off('put-save');
@@ -296,6 +329,10 @@ export default {
 					schedule = this.formData.schedule.map((item) => {
 						return [item[0].toString(), item[1].toString()];
 					});
+					if (schedule.length === 0) {
+						this.showHintSelectTime = true;
+						return false;
+					}
 				} else {
 					schedule = [];
 				}
@@ -323,26 +360,26 @@ export default {
 							campaignId: this.formData.campaignId
 						}, params) : params
 					})
-					.then((res) => {
-						if (!res.data.iserror) {
-							Event.$emit('put-save-result', {
-								error: 0,
-								res: res.data,
-								isRebate: this.formData.isRebate
-							});
-						} else {
+						.then((res) => {
+							if (!res.data.iserror) {
+								Event.$emit('put-save-result', {
+									error: 0,
+									res: res.data,
+									isRebate: this.formData.isRebate
+								});
+							} else {
+								Event.$emit('put-save-result', {
+									error: 1,
+									res: null
+								});
+							}
+						})
+						.catch((e) => {
 							Event.$emit('put-save-result', {
 								error: 1,
 								res: null
 							});
-						}
-					})
-					.catch((e) => {
-						Event.$emit('put-save-result', {
-							error: 1,
-							res: null
 						});
-					});
 				} else {
 					Event.$emit('put-save-result', {
 						error: 1,
@@ -359,6 +396,28 @@ export default {
 		},
 		delSchedule(index) {
 			this.formData.schedule.splice(index, 1);
+		},
+		mergeTime() {
+			var start = null;
+			var end = null;
+			for(let i = 0; i < this.formData.schedule.length; i++) {
+				for (let j = i + 1; j < this.formData.schedule.length; j++) {
+					if (this.formData.schedule[j][0] <= this.formData.schedule[i][1] && this.formData.schedule[j][1] >= this.formData.schedule[i][0]) {
+						if (this.formData.schedule[j][0] < this.formData.schedule[i][0]) {
+							start = this.formData.schedule[j][0];
+						} else {
+							start = this.formData.schedule[i][0];
+						}
+						if (this.formData.schedule[j][1] < this.formData.schedule[i][1]) {
+							end = this.formData.schedule[i][1];
+						} else {
+							end = this.formData.schedule[j][1];
+						}
+						this.formData.schedule[i] = [start, end];
+						this.formData.schedule.splice(j, 1);
+					}
+				}
+			}
 		}
 	},
 	watch: {
@@ -381,9 +440,9 @@ export default {
 			// 重置
 			if (this.noContinuousDate[0] !== null) {
 			    this.formData.schedule.push([this.noContinuousDate[0].valueOf(),this.noContinuousDate[1].valueOf()]);
-//				this.formData.schedule.push(`${this.noContinuousDate[0].valueOf()}-${this.noContinuousDate[1].valueOf()}`);
 				this.noContinuousDate[0] = this.noContinuousDate[1] = null;
 			}
+			this.showHintSelectTime = false;
 		},
 		startTime: function() {
 			if (this.startTime) {
@@ -394,12 +453,27 @@ export default {
 			if (this.endTime) {
 				this.formData.endTime = new Date(this.endTime).valueOf();
 			}
+		},
+		'formData.schedule': function() {
+			this.mergeTime();
 		}
 	}
 };
 </script>
 <style scoped>
+
+	.el-upload__tip{
+		line-height: 0.8;
+		margin: -8px 0 22px 140px;
+	}
 .error {
 	color: #ff5151;
+}
+.hintSelectTime{
+	position: absolute;
+	left: 0;
+	top: 10px;
+	color: #ff4949;
+	font-size: 13px;
 }
 </style>

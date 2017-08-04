@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta name="description" content="gomepulus">
+    <meta name="keyword" content="gomepulus AMP">
+    <title>登录注册</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta name="author" content="">
+    <link rel="stylesheet" type="text/css" href="../../css/public/public.css">
+    <link rel="stylesheet" type="text/css" href="../../css/module/amp.css">
+    <style type="text/css">
+      .error-body{overflow: hidden;}
+      .body-scaffold{width:500px;margin:50px auto 0;}
+      .error-404{height:320px;background: url(../../images/login/404.png) no-repeat;background-size: contain;}
+      .error-403{height:260px;background: url(../../images/login/403.png) no-repeat;background-size: contain;}
+      .error-500{height:320px;background: url(../../images/login/500.png) no-repeat;background-size: contain;}
+      .error-footer{text-align: center;color: #747071;}
+      .error-title{font-size: 24px;line-height: 50px;}
+      .error-detail{font-size: 14px;line-height: 40px;}
+      .error-footer a{display:inline-block;line-height:32px;font-size: 14px;width: 96px;height: 34px; margin:20px 13px 0;color: #414143;border: 2px solid #414143;border-radius: 34px;background: none;}
+      .error-footer .action-back{color: #d20313;border: 2px solid #d20313;}
+      .error-footer404{}
+      .error-footer403{display: none;}
+      .error-footer500{display: none;}
+    </style>
+  </head>
+  <body class="body-none">
+    <div class="login-header"><span class="header-login"><a href="#">gomeplus</a></span></div>
+    <div class="error-body">
+      <div class="body-scaffold error-404">
+
+      </div>
+    </div>
+    <div class="error-footer error-footer404">
+      <p class="error-title">哎呀糟糕！您访问的页面暂时没有找到</p>
+      <p class="error-detail">您可能输入了错的网址，或者该网址已经删除和移动</p>
+      <a class="action-back">回到首页</a>
+    </div>
+    <div class="error-footer error-footer403">
+      <p class="error-title">哎呀抱歉！服务器拒绝了您的请求</p>
+      <p class="error-detail">请确认您拥有所需的访问权限</p>
+      <a class="action-back">回到首页</a><a>返回上一页</a>
+    </div>
+    <div class="error-footer error-footer500">
+      <p class="error-title">哎呀出错了！</p>
+      <p class="error-detail">服务器出现内部错误，我们正在努力修复</p>
+      <a class="action-back">回到首页</a><a>返回上一页</a><a>尝试刷新</a>
+    </div>
+  </body>
+</html>

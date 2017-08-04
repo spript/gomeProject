@@ -6,6 +6,7 @@
         <button class="btn btn-normal" @click.prevent="start">启用</button>
         <button class="btn btn-normal" @click.prevent="stop">暂停</button>
         <button class="btn btn-normal" @click.prevent="del">删除</button>
+        <span class="set-option-hint" v-show='showOpationHint'>*请选择至少一项后，再进行操作。</span>
       </div>
       <div class="set-fn">
         <div class="fn-plan"><span class="plan-title">计划名称：</span>
@@ -13,21 +14,25 @@
             <input v-model="so.keyword" placeholder="请输入计划名称">
           </div>
         </div>
-        <div class="fn-plan">
-          <span class="plan-title">选择时间：</span>
-          <el-date-picker v-model="so.startTime" type="date" :editable="false" style="width:130px;" placeholder="开始日期">
-          </el-date-picker>
-          <span class="plan-title plan-title-gray">-</span>
-          <el-date-picker v-model="so.endTime" type="date" :editable="false" style="width:130px;" placeholder="结束日期">
-          </el-date-picker>
-        </div>
+        <el-form :model="so" :rules="rules" ref="formlist">
+          <div class="fn-plan">
+            <el-form-item prop="startTime" style="display:inline-block;">
+              <span class="plan-title">选择时间：</span>
+              <el-date-picker v-model="so.startTime" type="date" :editable="false" style="width:125px;" placeholder="开始日期">
+              </el-date-picker>
+              <span class="plan-title plan-title-gray">-</span>
+              <el-date-picker v-model="so.endTime" type="date" :editable="false" style="width:125px;" placeholder="结束日期">
+              </el-date-picker>
+            </el-form-item>
+          </div>
+        </el-form>
         <div class="fn-plan fn-plan-new"><span class="plan-title">状态：</span>
           <el-select v-model="so.state.value" style="width:130px;display:inline-block;" placeholder="全部">
             <el-option v-for="item in so.state.options" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </div>
-        <div class="fn-search" @click.prevent="getList"><a href="" class="btn btn-primary">查询</a></div>
+        <div class="fn-search" @click.prevent="search"><a href="" class="btn btn-primary">查询</a></div>
       </div>
     </div>
     <div class="amp-data">
@@ -36,7 +41,8 @@
           <table class="table main-table">
             <thead>
               <tr :class="{actived: isActived, 'list-header': true}">
-                <th class="w100"><span><em class="icon icon-select select-all" @click="checkall"></em><i class="data-id">计划ID</i></span></th>
+              	<th class="w50"><span><em class="icon icon-select select-all" @click="checkall"></em></span></th>
+                <th class="w100"><span><i class="data-id">计划ID</i></span></th>
                 <th class="w140"><span>计划名称</span></th>
                 <th class="w80"><span>状态</span></th>
                 <th class="w220"><span>有效期</span></th>
@@ -51,9 +57,13 @@
               </tr>
             </thead>
             <tbody>
+            	<tr class="body-row" v-if="list.length == 0">
+								<td colspan="13" style="text-align: center; height: 100px;line-height: 100px;">无相关查询结果</td>
+							</tr>
               <template v-for="item in list">
                 <tr :class="{actived: item.isActived, 'body-row': true}">
-                  <td><span><em @click="checkbox(item.campaignId)" :class="'icon icon-select select-' + item.campaignId" :data-id="item.campaignId"></em><i class="data-id">{{item.campaignId}}</i></span></td>
+                	<td><span><em @click="checkbox(item.campaignId)" :class="'icon icon-select select-' + item.campaignId" :data-id="item.campaignId"></em></span></td>
+                  <td><span><i class="data-id">{{item.campaignId}}</i></span></td>
                   <td><span><i class="ellipsis"><router-link :to="{name: 'bidcpcUnit', params: {id: item.campaignId}}" :title="item.name">{{item.name}}</router-link></i></span></td>
                   <td><span :class="{'plan-state-other': item.state !== 2 && item.state !== 3 && item.state !== 4, 'plan-state-expire': item.state === 3, 'span-col-4': true}">
                     {{item.state==1?"暂停":(item.state==2?"有效":(item.state==3?"过期":(item.state==4?"未开始":(item.state==5?"预算用完":(item.state==6?"不在投放时间段":"余额不足")))))}}
@@ -102,7 +112,7 @@
     <el-dialog :title=title v-model="dialogVisible" size="tiny">
       <span v-html="body_html"></span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="dialogVisible = false" v-show='showCancel'>取 消</el-button>
         <el-button type="primary" @click="sureFn">确 定</el-button>
       </span>
     </el-dialog>
@@ -117,16 +127,30 @@ import Api from "../../../../config/api.config";
 import http from "../../../../utils/http";
 import Event from 'event';
 import {formatDate,mixin} from 'utils/common';
+import moment from 'moment';
 import {tableHandler, offWindowEvent, initWindowResize} from 'utils/table';
 
 export default {
   name: 'app-put-bidcpc-plan-list',
   data() {
     return {
+    	rules: {
+        startTime: [{
+          validator: (rule, value, callback) => {
+            if(+this.so.endTime != 0 && +this.so.startTime > +this.so.endTime){
+              callback(new Error("开始时间不得晚于结束时间"));
+            }else{
+              callback();
+            }
+          },
+          trigger: "change"
+        }]
+      },
+    	showOpationHint: false,
       so: {
         keyword: "",
-        startTime: new Date(),
-        endTime: new Date(),
+        startTime: moment().startOf('day').valueOf(),
+        endTime: moment().endOf('day').valueOf(),
         state: {
           options: [{
             label: "全部",
@@ -157,13 +181,23 @@ export default {
       dialogVisible: false,
       title : '提示',
       body_html : '',
-      btn_state : ''
+      btn_state : '',
+      showCancel: true,
     };
   },
   components: {
 
   },
   computed: {
+  	dailyBudget() {
+  		var dailyBudgetNum = 0,list = this.list;
+      for(var item of list){
+        if(item.isActived){
+          dailyBudgetNum += item.dailyAdBudget / 100;
+        }
+      }
+      return dailyBudgetNum;
+  	},
     campaignIds(){
       var campaignIds = [],list = this.list;
       for(var item of list){
@@ -172,6 +206,66 @@ export default {
         }
       }
       return campaignIds;
+    },
+    startStates(){
+    	var states = this.selectedPlan,num;
+      if (states.length == 1) {
+      	if (states[0] == 1) {
+      		num = 1;//不是暂停
+      	} else {
+      		num = 2;
+      	}
+      } else {
+      	for(let i = 0; i < states.length; i++) {
+	      	if (states[i] == 1) {
+	      		num = 3;
+	      	} else {
+	      		num = 4;
+	      		break;
+	      	}
+	      }
+      }
+      return num;
+    },
+    stopStates(){
+    	var states = this.selectedPlan,num;
+      if (states.length == 1) {
+      	if (states[0] == 2 || states[0] == 4) {
+      		num = 1;
+      	} else {
+      		num = 2;
+      	}
+      } else {
+      	for(var i = 0; i < states.length; i++) {
+	      	if (states[i] != 2 && states[i] != 4) {
+	      		num = 4;
+	      		break;
+	      	} else {
+	      		num = 3;
+	      	}
+	      }
+      }
+      return num;
+    },
+    delStates(){
+    	var states = this.selectedPlan,num;
+      if (states.length == 1) {
+      	if (states[0] == 1 || states[0] == 3 || states[0] == 4) {
+      		num = 1;
+      	} else {
+      		num = 2;
+      	}
+      } else {
+      	for(let i = 0; i < states.length; i++) {
+	      	if (states[i] == 1 || states[i] == 3 || states[i] == 4) {
+	      		num = 3;
+	      	} else {
+	      		num = 4;
+	      		break;
+	      	}
+	      }
+      }
+      return num;
     },
     isActived(){
       var isActived = true, list = this.list;
@@ -183,6 +277,15 @@ export default {
         break;
       }
       return isActived;
+    },
+    selectedPlan() {
+    	var states = [],list = this.list;
+      for(var item of list){
+        if(item.isActived){
+          states.push(item.state);
+        }
+      }
+      return states;
     }
   },
   created(){
@@ -194,10 +297,10 @@ export default {
     });
   },
   mounted() {
-    initWindowResize('con-table-change', true);
+    initWindowResize('con-table-change', true, 4);
   },
   updated() {
-    tableHandler('con-table-change', true);
+    tableHandler('con-table-change', true, 4);
   },
   destroyed() {
     offWindowEvent('con-table-change');
@@ -258,6 +361,15 @@ export default {
       })
       .catch(function(error) {
         alert("list fail");
+      });
+    },
+    search(){
+      var that = this;
+      this.$refs.formlist.validate(function(valid){
+        if(!valid){
+          return;
+        }
+        that.getList();
       });
     },
     sureFn(){
@@ -337,35 +449,74 @@ export default {
         .catch(function(error) {
           alert("fail");
         });
+      } else if (this.btn_state == 'cancel') {
+      	this.dialogVisible=false;
       }
       this.dialogVisible=false;
+    },
+    toastChangeHint(condition, statusStr, type) {
+    	let singelCan = `<h3>确定${type}该投放计划吗？</h3>`
+    	let singelNoCan = `<h3>仅${statusStr}状态的投放计划才可以${type}。</h3>`
+    	let multipleCan = `<h3>已选择${this.campaignIds.length}个投放计划，确定全部${type}吗？</h3>`
+    	let multipleNoCan = `<h3>已选择${this.campaignIds.length}个投放计划，其中仅${statusStr}状态的计划才可以${type}。请重新选择。</h3>`
+    	let surnType = type == '启动' ? 'start' : (type == '暂停' ? 'stop' : (type == '删除' ? 'delete' : ''));
+    	if (condition == 1) {
+    		this.body_html = singelCan;
+    		this.showCancel = true;
+    		this.btn_state = surnType
+    	} else if (condition == 2) {
+    		this.body_html = singelNoCan;
+    		this.showCancel = false;
+    		this.btn_state = 'cancel';
+    	} else if (condition == 3) {
+    		this.body_html = multipleCan;
+    		this.showCancel = true;
+    		this.btn_state = surnType;
+    	} else if (condition == 4) {
+    		this.body_html = multipleNoCan;
+    		this.showCancel = false;
+    		this.btn_state = 'cancel';
+    	}
+    	this.dialogVisible = true;
     },
     start(){
       var that = this, list = this.list;
       if(!this.campaignIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	http.get('/api/account')
+      	.then((res)=> {
+      		if (res.data.code == 200) {
+      			if (res.data.data.adBalance <= this.dailyBudget) {
+      					this.body_html = `<h3>广告账户余额不足，请您充值后，再启动计划。</h3>`;
+					      this.btn_state = 'cancel';
+					      this.showCancel = false;
+					      this.dialogVisible = true;
+      			} else {
+      				this.toastChangeHint(this.startStates, '“暂停”', '启动');
+      			}
+      		}
+      	})
+      	.catch((error) => {
+      		console.log(error);
+      	})
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定启动该投放计划吗？</h3>';
-      this.btn_state = 'start';
     },
     stop(){
       var that = this, list = this.list;
       if(!this.campaignIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.stopStates, '“有效”或“未开始”', '暂停');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定暂停该投放计划吗？</h3>';
-      this.btn_state = 'stop';
     },
     del(){
       var that = this, list = this.list;
       if(!this.campaignIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.delStates, '暂停、未开始和过期', '删除');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定要删除该投放计划吗？</h3><p>(删除后信息将不在本列表展示，相关数据可在数据报表查看)</p>';
-      this.btn_state = 'delete';
     },
     modify(id){
       this.getData(id, (data) => {
@@ -388,17 +539,37 @@ export default {
       });
     },
     newUnit(id) {
-    	this.getData(id, (data) => {
-    		actions.controlDrawer(this.$store, {
-	    		show: true,
-	    		action: 'new',
-	    		type: 'unit',
-	    		config: mixin({
-	    			campaignId: id
-	    		}, CONST.DRAWERUNIT),
-	    		isRebate: data.isRebate
-	    	});
-    	});
+    	http.get('/api/flights', {
+    		params: {
+    			campaignId: id,
+    			productLine: 3
+    		}
+    	})
+    	.then((res) => {
+    		if (res.data.code == 200) {
+    			if (res.data.data.totalCount == 20) {
+    				this.showCancel = false;
+		    		this.dialogVisible = true;
+		      	this.body_html = '<h3>一个投放计划下最多可创建20个投放单元</h3>';
+		      	this.btn_state = 'cancel';
+    			} else {
+    				this.getData(id, (data) => {
+			    		actions.controlDrawer(this.$store, {
+				    		show: true,
+				    		action: 'new',
+				    		type: 'unit',
+				    		config: mixin({
+				    			campaignId: id
+				    		}, CONST.DRAWERUNIT),
+				    		isRebate: data.isRebate
+				    	});
+			    	});
+    			}
+    		}
+    	})
+    	.catch((error) => {
+    		console.log(error);
+    	})
     },
     getData(id, cb){
       var that = this;
@@ -474,6 +645,13 @@ export default {
 			}
 		}
 	}
+  },
+  watch: {
+  	'campaignIds' : function() {
+			if (this.campaignIds.length) {
+				this.showOpationHint = false;
+			}
+		}
   }
 };
 </script>

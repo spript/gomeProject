@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="account-set">
-			<div class="set-fn"><span class="btn btn-normal" @click.prevent="newPage">新建页面</span></div>
+			<div class="set-fn"><span class="btn btn-normal" @click.prevent="newPage">新建自建页面</span></div>
 			<br>
 			<div class="set-fn">
 				<div class="fn-plan">

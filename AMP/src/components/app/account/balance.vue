@@ -70,13 +70,8 @@ export default {
 	data() {
 		return {
 			breadcrumbConfig: {
-				data: [{
-					msg: '我的账户',
-					link: '/#/app/account/'
-				}, {
-					msg: '余额提醒',
-					link: '/#' + this.$route.path
-				}]
+				msg: '余额提醒',
+				showBack: false
 			},
 			isFinishLoading:false,
 			balanceForm:{

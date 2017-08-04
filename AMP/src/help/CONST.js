@@ -19,15 +19,7 @@ export default {
 		'platform': 1, // 投放平台（1-APP 2-WAP 3-PC）
 		'type': 1, // 投放类型（1-商品推广 2-活动推广 ）
 		'timeType': 0, // 时间定向类型（0-全时段 1-自定义）
-		'time': { // 时间定向
-			'1': [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-			'2': [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-			'3': [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-			'4': [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-			'5': [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-			'6': [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-			'7': [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
-		},
+		'time': [],// 时间定向
 		'regionType': 0, // 地域定向类型（0-不限 1-自定义 ）
 		'region': [], // 地域定向
 		'ageType': 0, // 年龄定向类型（0-不限 1-自定义）
@@ -36,7 +28,8 @@ export default {
 		'gender': [], //性别
 		'rebateBid': 10, // 分享返利
 		'videoRebate': 10, //视频返利
-		'researchRebate':	30, //调研返利
+		'researchRebate': 30, //调研返利
+		'questionnaireTotalLimited': 1,//调查问卷收集份数 （0-不限 1-自定义 ）
 		'advertisements': [],
 		'surveyId': '',
 		'validQuestionnaireNum': '',
@@ -59,6 +52,7 @@ export default {
 		'description': '', // 文案
 		'relatedItems': [],// 联合推广商品
 		'products': [],
+		'relatedItemStrategy': 3,
 		'topicId': '',
 		'topicTitle':'' ,  //话题标题
 		'topicName':'' ,  //话题名称
@@ -69,11 +63,16 @@ export default {
 		'itemList':[],
 		'description':'', //店铺文案描述
 		'useDefaultImage': 0,//视频封面图片
-		'promotionType': 0 //视频推广内容
+		'promotionType': 0, //视频推广内容
+		'cardDescription': '', //分享卡描述
+		'cardTitle': '',//分享卡标题
+		'title':'',     //标题
+		'videoTitle':'',//视频模板标题
 	},
 	DRAWQUESTION:{ //新建调查问卷
 		standQuestion:'标准题库',
 		selectQueation:'单选题',
 		questions:[]
-	}
+	},
+	TIMESTAMP_2038_01_01: 2145888000000
 };

@@ -8,12 +8,13 @@
     </div>
     <div class="account-set">
       <div class="set-option">
-        <router-link :to="{name: 'bidcpcUnit', params: {id: campaignId}}" class="btn btn-normal btn-back-up"><em class="icon icon-prev"></em>返回</router-link>
+        <!--<router-link :to="{name: 'bidcpcUnit', params: {id: campaignId}}" class="btn btn-normal btn-back-up"><em class="icon icon-prev"></em>返回</router-link>-->
         <a href="" class="btn btn-normal" @click.prevent="newIdea">新建创意</a>
         <a href="" class="btn btn-normal" @click.prevent="start">启用</a>
         <a href="" class="btn btn-normal" @click.prevent="stop">暂停</a>
         <a href="" class="btn btn-normal" @click.prevent="del">删除</a>
         <a href="" class="btn btn-normal" @click.prevent="showAddKeyword = true">关键词管理</a>
+        <span class="set-option-hint" v-show='showOpationHint'>*请选择至少一项后，再进行操作。</span>
       </div>
       <div class="set-fn">
         <div class="fn-plan"><span class="plan-title">创意状态：</span>
@@ -40,6 +41,9 @@
               </tr>
             </thead>
             <tbody>
+            	<tr class="body-row" v-if="list.length == 0">
+								<td colspan="6" style="text-align: center; height: 100px;line-height: 100px;">无相关查询结果</td>
+							</tr>
               <template v-for="item in list">
                 <tr :class="{actived: item.isActived, 'body-row': true}">
                   <td><span><em @click="checkbox(item.materialId)" :class="'icon icon-select select-' + item.materialId" :data-id="item.materialId"></em></span></td>
@@ -71,7 +75,7 @@
     <el-dialog :title="title" v-model="dialogVisible" size="tiny">
       <span v-html="body_html"></span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="dialogVisible = false" v-show='showCancel'>取 消</el-button>
         <el-button type="primary" @click=sureFn>确 定</el-button>
       </span>
     </el-dialog>
@@ -99,6 +103,8 @@ export default {
   name: 'app-put-bidcpc-idea-list',
   data() {
     return {
+    	showCancel: true,
+    	showOpationHint: false,
       campaignId: localStorage.getItem("campaignId"),
       flightId: this.$route.params.id,
       dialogImageVisible: false,
@@ -172,6 +178,55 @@ export default {
         break;
       }
       return isActived;
+    },
+    stopStates(){
+    	var states = this.selectedIdea,num;
+      if (states.length == 1) {
+      	if (states[0] != 2) {
+      		num = 1;//其他
+      	} else {
+      		num = 2;//有效
+      	}
+      } else {
+      	for(let i = 0; i < states.length; i++) {
+	      	if (states[i] == 2) {
+	      		num = 3;//全是有效
+	      	} else {
+	      		num = 4;//混合
+	      		break;
+	      	}
+	      }
+      }
+      return num;
+    },
+    startDelStates(){
+    	var states = this.selectedIdea,num;
+      if (states.length == 1) {
+      	if (states[0] == 3) {
+      		num = 1;//暂停
+      	} else {
+      		num = 2;//其他
+      	}
+      } else {
+      	for(let i = 0; i < states.length; i++) {
+	      	if (states[i] == 3) {
+	      		num = 3;//全是暂停
+	      	} else {
+	      		num = 4;//混合
+	      		break;
+	      	}
+	      }
+      }
+      return num;
+    },
+    selectedIdea(){
+    	var states = [],list = this.list;
+      for(var item of list){
+        if(item.isActived){
+          states.push(item.state);
+        }
+      }
+      return states;
     }
   },
   created(){
@@ -218,10 +273,10 @@ export default {
         console.log(e);
       });
 		});
-    initWindowResize('mainDataTable', true);
+    initWindowResize('mainDataTable', true, 4);
 	},
   updated() {
-    tableHandler('mainDataTable', true);
+    tableHandler('mainDataTable', true, 4);
   },
   destroyed() {
     offWindowEvent('mainDataTable');
@@ -415,71 +470,99 @@ export default {
         .catch(function(error) {
           alert("fail");
         });
+      } else if (this.btn_state == 'cancel') {
+      	this.dialogVisible=false;
       }
       this.dialogVisible=false;
+    },
+    toastChangeHint(condition, type) {
+    	var hintStr = '';
+    	if (condition == 1) {
+      	hintStr = type == 'start' ? `<h3>确定启动该创意吗？</h3>` : (type == 'stop' ? `<h3>仅“有效”状态的创意才可以暂停。</h3>` : (type == 'delete' ? `<h3>确定删除该创意吗？</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'start' : (type == 'stop' ? 'cancel' : (type == 'delete' ? 'delete' : ''));
+	      this.showCancel = type == 'start' ? true : (type == 'stop' ? false : (type == 'delete' ? true : ''));
+	  	} else if (condition == 2) {
+	      hintStr = type == 'start' ? `<h3>仅“暂停”状态的创意才可以启动。</h3>` : (type == 'stop' ? `<h3>确定暂停该创意吗？</h3>` : (type == 'delete' ? `<h3>仅“暂停”状态的创意才可以删除。</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'cancel' : (type == 'stop' ? 'stop' : (type == 'delete' ? 'cancel' : ''));
+	      this.showCancel = type == 'start' ? false : (type == 'stop' ? true : (type == 'delete' ? false : ''));
+	  	} else if (condition == 3) {
+  			hintStr = type == 'start' ? `<h3>已选择${this.materialIds.length}个创意，确定全部启动吗？</h3>` : (type == 'stop' ? `<h3>已选择${this.materialIds.length}个创意，确定全部暂停吗？</h3>` : (type == 'delete' ? `<h3>已选择${this.materialIds.length}个创意，确定全部删除吗？</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'start' : (type == 'stop' ? 'stop' : (type == 'delete' ? 'delete' : ''));
+	      this.showCancel = type == 'start' ? true : (type == 'stop' ? true : (type == 'delete' ? true : ''));
+	  	} else if (condition == 4) {
+  			hintStr = type == 'start' ? `<h3>已选择${this.materialIds.length}个创意，其中仅“暂停”状态的创意才可以启动。请重新选择。</h3>` : (type == 'stop' ? `<h3>已选择${this.materialIds.length}个创意，其中仅“有效”状态的创意才可以暂停。请重新选择。</h3>` : (type == 'delete' ? `<h3>已选择${this.materialIds.length}个创意，其中仅“暂停”状态的创意才可以删除。请重新选择。</h3>` : ''));
+	      this.btn_state = type == 'start' ? 'cancel' : (type == 'stop' ? 'cancel' : (type == 'delete' ? 'cancel' : ''));
+	      this.showCancel = type == 'start' ? false : (type == 'stop' ? false : (type == 'delete' ? false : ''));
+	  	}
+	  	this.dialogVisible = true;
+			this.body_html = hintStr;
     },
     start(){
       var that = this, list = this.list;
       if(!this.materialIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.startDelStates, 'start');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定启动该创意吗？</h3>';
-      this.btn_state = 'start';
     },
     stop(){
       var that = this, list = this.list;
       if(!this.materialIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.stopStates, 'stop');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定暂停该创意吗？</h3>';
-      this.btn_state = 'stop';
     },
     del(){
       var that = this, list = this.list;
       if(!this.materialIds.length){
-        return;
+        this.showOpationHint = true;
+      } else {
+      	this.toastChangeHint(this.startDelStates, 'delete');
       }
-      this.dialogVisible = true;
-      this.body_html = '<h3>确定删除该创意吗？</h3>';
-      this.btn_state = 'delete';
     },
     newIdea() {
-      var that = this;
-      http.get("/api/campaign", {
-        params:{
-          campaignId: this.campaignId
-        }
-      })
-      .then(res => {
-        if(res.data.code == 200){
-          if(this.summary.type == 1) {
-            actions.controlDrawer(that.$store, {
-              show: true,
-              action: 'new',
-              type: 'idea',
-              config: mixin({
-                flightId: that.flightId
-              }, CONST.DRAWERIDEA),
-              isRebate: res.data.data.isRebate
-            });
-          } else if(this.summary.type == 2){
-            actions.controlDrawer(that.$store, {
-              show: true,
-              action: 'new',
-              type: 'idea_url',
-              config: mixin({
-                flightId: that.flightId
-              }, CONST.DRAWERIDEA),
-              isRebate: res.data.data.isRebate
-            });
-          }
-        }
-      })
-      .catch(function(error){
-        console.log(error);
-      });
+    	if (this.page.totalCount == 50) {
+    		this.showCancel = false;
+    		this.dialogVisible = true;
+      	this.body_html = '<h3>一个投放单元下最多可创建50个创意。</h3>';
+      	this.btn_state = 'cancel';
+    	} else {
+    		var that = this;
+	      http.get("/api/campaign", {
+	        params:{
+	          campaignId: this.campaignId
+	        }
+	      })
+	      .then(res => {
+	        if(res.data.code == 200){
+	          if(this.summary.type == 1) {
+	            actions.controlDrawer(that.$store, {
+	              show: true,
+	              action: 'new',
+	              type: 'idea',
+	              config: mixin({
+	                flightId: that.flightId
+	              }, CONST.DRAWERIDEA),
+	              isRebate: res.data.data.isRebate
+	            });
+	          } else if(this.summary.type == 2){
+	            actions.controlDrawer(that.$store, {
+	              show: true,
+	              action: 'new',
+	              type: 'idea_url',
+	              config: mixin({
+	                flightId: that.flightId
+	              }, CONST.DRAWERIDEA),
+	              isRebate: res.data.data.isRebate
+	            });
+	          }
+	        }
+	      })
+	      .catch(function(error){
+	        console.log(error);
+	      });
+    	}
     },
     modify(id){
       this.getData(id, "modify");
@@ -550,6 +633,13 @@ export default {
         }
       }
     }
-  }
+  },
+  watch: {
+		'materialIds' : function() {
+			if (this.materialIds.length) {
+				this.showOpationHint = false;
+			}
+		}
+	}
 };
 </script>

@@ -19,7 +19,7 @@
 				<div class="statis-title"><em class="icon icon-msg"></em><span>最新消息</span></div>
 				<div class="statis-cont statis-cont-reset">
 					<dl>
-						<dt v-for="msg in result.messages" v-bind:class="{'cont-new':!msg.isRead}"><router-link :to="{name: 'message-detail', params:{type:msg.type,id: msg.messageId}}"><em class="icon icon-letter"></em><span class="cont-text">{{msg.title}}</span><span class="cont-time">{{formatDate(msg.time)}}</span></router-link></dt>
+						<dt v-for="msg in result.messages" v-bind:class="{'cont-new':!msg.isRead}"><router-link :to="{name: 'message-detail', params:{type:msg.type,id: msg.messageId}}"><em class="icon icon-letter"></em><span class="cont-text">{{msg.title}}</span><span class="cont-time">{{msg.time | moment('YYYY/MM/DD')}}</span></router-link></dt>
 					</dl>
 				</div>
 			</li>

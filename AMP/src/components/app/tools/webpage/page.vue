@@ -14,13 +14,8 @@ export default {
 	data() {
 		return {
 			breadcrumbConfig: {
-				data: [{
-					msg: '工具',
-					link: '/#/app/page/'
-				}, {
-					msg: '自建页面',
-					link:'/#/app/page/list'
-				}]
+				msg: '自建页面',
+				showBack: false
 			}
 		};
 	},

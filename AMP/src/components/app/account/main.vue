@@ -49,7 +49,7 @@ export default {
 				sub: []
 			}, {
 				msg: '商家资质',
-				link: '/#/app/account/business-aptitude',
+				link: '/#/app/account/certificate',
 				icon: 'icon-aptitude',
 				checked: false,
 				sub: []

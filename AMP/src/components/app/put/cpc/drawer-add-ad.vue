@@ -45,7 +45,9 @@
 								<th width="140"><span>创意尺寸限制</span></th>
 								<th width="140"><span>创意大小限制</span></th>
 							</tr>
-							<tr :class="{'actived': item.checked}" v-for="(item, index) in anices.list">
+							<tr :class="{'actived': item.checked}" v-for="(item, index) in anices.list"
+								:style="{'background': selectAdvertisementId == item.advertisementId ? '#f2faff':''}"
+							    @click="selectAd(item.advertisementId)">
 								<!-- <td><span><el-checkbox v-model="item.checked"></el-checkbox></span></td> -->
 								<td><span><el-radio v-model="selectAdvertisementId" :label="item.advertisementId" class="no_lable"></el-radio></span></td>
 								<td><span>{{item.publisherName}}</span></td>
@@ -90,6 +92,7 @@ export default {
 				total: 0,
 				list: []
 			},
+			trHover:false,
 			selectAdvertisementId: NaN,
 			checkAllSelect: false
 		};
@@ -107,6 +110,9 @@ export default {
 		this.getAnicesList();
 	},
 	methods: {
+		selectAd(Id) {
+		    this.selectAdvertisementId = Id;
+		},
 		getPublishersList() {
 			Http.get('api/publishers', {
 				params: {
@@ -210,7 +216,12 @@ export default {
 };
 </script>
 <style scoped>
-.el-radio .el-radio__label{
-	display: none;
-}
+	.el-button{
+		background:#d30312;
+		color:#fff;
+		border-color:#d30312;
+	}
+	.el-radio .el-radio__label{
+		display: none;
+	}
 </style>

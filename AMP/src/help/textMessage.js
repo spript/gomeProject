@@ -55,13 +55,19 @@ export const ERRORMESSAGE = {
 		balanceMoneyRequired:'请输入提醒金额',
 		balanceMoneyMaxValue:'提醒金额最高不超过1000元'
 	},
-	Business:{
+	Certificate: {
 		qualificationNameRequired:'请输入资质名称',
 		qualificationMaxLength:'最大长度不超过30个汉字',
 		qualificationFileRequired:'请上传资质文件',
 		pictureMaxSize:'单张图片最大不超过500K',
 		pictureType:'图片仅支持JPG、PNG格式',
 		qualificationValidStartTime:'请选择起始日期',
-		qualificationValidEndTime:'请选择结束日期'
+		qualificationValidEndTime:'请选择结束日期',
 	}
+};
+
+export const TEXT_MESSAGE = {
+	commonMessage: {
+		longTermEffective: '长期有效',
+	},
 };

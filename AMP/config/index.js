@@ -27,7 +27,7 @@ module.exports = {
 		index: path.resolve(__dirname, '../dist/index.html'),
 		assetsRoot: path.resolve(__dirname, '../dist'),
 		assetsSubDirectory: 'static',
-		assetsPublicPath: 'http://10.69.205.18:8000/',
+		assetsPublicPath: 'http://10.112.178.90:8000/m/AMP/dist/',
 		assetsPath: '/',
 		productionSourceMap: false,
 		productionGzip: false,

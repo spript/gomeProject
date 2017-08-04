@@ -16,13 +16,8 @@ export default {
 	data() {
 		return {
 			breadcrumbConfig: {
-				data: [{
-					msg: '投放管理',
-					link: '/#/app/bidcpc/'
-				}, {
-					msg: '投放计划',
-					link: '/#' + this.$route.path
-				}]
+				msg: '投放计划',
+				showBack: false
 			}
 		};
 	},
