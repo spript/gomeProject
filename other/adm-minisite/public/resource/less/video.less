@@ -1,0 +1,229 @@
+@import './base.less';
+@import './common.less';
+    .videoDetail{
+        width:100%;
+    }
+    .video-box {
+        position: relative;
+        font-size: 0;
+        background: #fff;
+    }
+
+    .video-box img {
+        width: 100%;
+    }
+    .video_header{
+        background: #fff;
+        h2{
+            font-size: .48rem;
+            color: #333;
+            margin-top: .3rem;
+        }
+        border-bottom: 1px solid #ddd;
+    }
+    .video_content{
+        padding: 0 .22rem;
+        padding-bottom: .5rem;
+        .share_tips{
+            margin: .14rem 0 0 0;
+        }
+        p{
+            font-size: .32rem;
+            color: #000;
+            line-height: .52rem;
+            padding: .5rem 0 0 0;
+            border-top: 1px solid #f1f1f1;
+            margin: .3rem 0 0 0;
+        }
+    }
+
+    .video-box .video-play {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate3d(-50%,-50%,0);
+        transform: translate3d(-50%,-50%,0);
+        width: 1.4rem;
+        height: 1.4rem;
+        background-color: rgba(0,0,0,.7);
+        border-radius: .08rem;
+        color: #fff;
+        text-align: center
+    }
+
+    .video-box .video-play .iconmoon {
+        display: block;
+        font-size: .4rem;
+        margin: .26rem auto .2rem
+    }
+
+    .video-box .video-play strong {
+        font-weight: 400;
+        font-size: .24rem
+    }
+    .video_list{
+        margin: .18rem 0;
+        margin-bottom: 0;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        background: #fff;
+        padding: 0 .22rem;
+        
+        ul{
+            li{
+                margin-top: .5rem;
+                padding-bottom: .5rem;
+                border-bottom: 1px solid #ddd;
+                overflow:hidden;
+                &:last-child{
+                    border-bottom: 0 none;
+                }
+                .shop_item_right{
+                    float: right;
+                    position: relative;
+                    width: 4.25rem;
+                    height: 2.4rem;
+                    h2{
+                        font-size: .42rem;
+                        color: #333;
+                        float:left;
+                        width: 100%;
+                        margin-bottom: .3rem;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        -webkit-line-clamp: 1;
+                    }
+                    p{
+                        font-size: .26rem;
+                        color: #999;
+                        width: 100%;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        -webkit-line-clamp: 2;
+                    }
+                    span{
+                        font-size: .4rem;
+                        color: #ea5c5e;
+                        float:left;
+                        position: absolute;
+                        left: 0;
+                        bottom: -.1rem;
+                    }
+                }
+                img{
+                    width: 2.4rem;
+                    float: left;
+                    margin-right: .4rem;
+                }
+            }
+        }
+    }
+    .video_templet_shop{
+        padding-top: .5rem;
+        padding-bottom: .6rem;
+        background: #fff;
+        margin: .18rem 0 1rem 0;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        .video_inner{
+            width: 5.2rem;
+            margin: 0 auto;
+            .goShop{
+                font-size: .28rem;
+                color: #ea5c5e;
+                border: .5px solid #ea5c5e;
+                padding: .16rem .34rem;
+                border-radius: .6rem;
+                display: block;
+                margin: 0 auto;
+                width: 1.8rem;
+                text-align: center;
+                margin-top: .4rem;
+            }
+            .shop_logo{
+                position: relative;
+                width: 1.3rem;
+                height: 1.3rem;
+                margin: 0 auto;
+                margin-bottom: .38rem;
+                border: .5px solid #ddd;
+                text-align: center;
+                img {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: auto;
+                    height: auto;
+                    max-width: 100%;
+                    max-height: 100%;
+                    margin: auto;
+                    vertical-align: middle;
+                }
+            }
+            h2{
+                font-size: .36rem;
+                color: #333;
+                text-align: center;
+                margin-top: .3rem;
+                margin-bottom: .26rem;
+            } 
+            p{
+                font-size: .26rem;
+                color: #333;
+                line-height: 1.67;
+                text-align: center;
+                span{
+                    display: inline-block;
+                    text-align: left;
+                }
+            }
+            img{
+                width: 1.3rem;
+                height: 1.3rem;
+                margin: 0 auto;
+                display: block;
+            }
+        }
+    }
+    .video-login-box{
+        display: none;
+        position: fixed;
+        bottom: 1rem;
+        width: 100%;
+        height: .84rem;
+        font-size: .26rem;
+        color: #fff;
+        background: rgba(0, 0, 0, .8);
+        div{
+            &.login-box-text{
+                float: left;
+                margin-left: .22rem;
+                line-height: .84rem;
+                text-align: left;
+            }
+            &.login-box-btn{
+                float: right;
+                width: 1.26rem;
+                height: .44rem;
+                margin: .2rem .4rem;
+                line-height: .44rem;
+                text-align: center;
+                background: #ea5c5e;
+                border-radius: .44rem;
+
+            }
+            &:after{
+                content: " ";
+                width: 0;
+                height: auto;
+                display: block;
+                clear: both;
+            }
+        }
+    }

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html data-use-rem='750'>
+<head>
+    <title>问卷</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="public/resource/css/question.css"/>
+</head>
+<body>
+    <script type="text/javascript">
+    (function(win){var doc=win.document,html=doc.documentElement,option=html.getAttribute("data-use-rem");if(option===null){return}var baseWidth=parseInt(option).toString()==="NaN"?640:parseInt(option);var grids=baseWidth/100;var         clientWidth=html.clientWidth||320;var fontsize=html.style.fontSize=clientWidth/grids+"px";fontsize=parseFloat(fontsize);var maxFontsize=Math.ceil(fontsize);var minFontsize=Math.floor(fontsize);var testDom=document.createElement("div");   var testDomWidth=0;var adjustRatio=0;testDom.style.cssText="height:0;width:1rem;";doc.body.appendChild(testDom);var calcTestDom=function(){testDomWidth=testDom.offsetWidth;                                                                  if(testDomWidth<minFontsize||testDomWidth>maxFontsize){adjustRatio=clientWidth/grids/testDomWidth;var reCalcRem=clientWidth*adjustRatio/grids;html.style.fontSize=reCalcRem+"px"}else{doc.body.removeChild(testDom)}};setTimeout(calcTestDom, 20);var reCalc=function(){var newCW=html.clientWidth;if(newCW===clientWidth){return}clientWidth=newCW;html.style.fontSize=newCW*(adjustRatio?adjustRatio:1)/grids+"px"};if(!doc.addEventListener){return}var resizeEvt="orientationchange"in  win?"orientationchange":"resize";win.addEventListener(resizeEvt,reCalc,false);doc.addEventListener("DOMContentLoaded",reCalc,false)})(window);
+    </script>
+
+
+		<header>
+			<h2 class="header-title">
+				NIKE旗舰店满意度调查
+			</h2>
+			<p class="header-description">
+				因近日收到多起投诉，所以我们开展全方位的整改行动。我们会根据调查结果尽快改进服务质量，以用户满意。稍后我们会随机抽取幸运被访者，送出现金洪红包。
+			</p>
+		</header>
+		<section>
+			<div class="grade question" data-judge="grade">
+				<h2><span data-survey-question-id='fenshu'>1.</span>请对店铺的满意度打分<em style="color: #EA5C5E;">(必答)</em></h2>
+				<div class="heart">
+					<ul class="clearfix">
+						<li></li>
+						<li></li>
+						<li></li>
+						<li></li>
+						<li></li>
+					</ul>
+				</div>
+			</div>
+			<div class="radio question" data-judge="radio">
+				<h2><span data-survey-question-id='radio1'>2.</span>您的性别</h2>
+				<div class="formRadio"><input value="1" type="radio" id="linkLabel1" name="radio"/><label id="label" for="linkLabel1"><p></p><span class="radioText">男</span></label></div>
+				<div class="formRadio"><input value="2" type="radio" id="linkLabel2" name="radio"/><label id="label" for="linkLabel2"><p></p><span class="radioText">女</span></label></div>
+			</div>
+			<div class="checkBox question" data-judge="checkBox">
+				<h2><span data-survey-question-id='duoxuan2'>3.</span>在什么渠道知道我们的？（多选）</h2>
+				<div class="content">
+					<ul>
+						<li><input type="checkbox" id="box11" value="电视11" /><label for="box11"><span>电视</span></label></li>
+						<li><input type="checkbox" id="box22" value="电视22" /><label for="box22"><span>杂志</span></label></li>
+						<li><input type="checkbox" id="box33" value="电视33" /><label for="box33"><span>报纸</span></label></li>
+						<li><input type="checkbox" id="box44" value="电视44" /><label for="box44"><span>门户网站</span></label></li>
+					</ul>
+				</div>
+			</div>
+			<div class="textBox question" data-judge="textarea">
+				<h2><span data-survey-question-id='yijian'>4.</span>请您留下宝贵的意见和建议</h2>
+				<textarea onkeyup="Event.judgeSubmit();" placeholder="这里是意见......" id="textBox-textarea"></textarea>
+			</div>
+		</section>
+		<footer>
+			<a class="surveySubmit">提交</a>
+		</footer>
+		<div id="popup" class="none">
+			<div class="content">
+				<div class="top">
+					<div class="top-finish">
+						<p class="finish">答题完成</p>
+						<p class="thank">感谢您的参与</p>
+					</div>
+				</div>
+				<a href="javascript:;" class="bottom">完成</a>
+			</div>
+		</div>
+		<div id="answered" class="none">
+			<div class="content">
+				<div class="top">
+					<div class="top-finish">
+						<p>您已经答过题</p>
+						<p>感谢您的参与</p>
+					</div>
+				</div>
+				<a class="bottom">完成</a>
+			</div>
+		</div>
+	</body>
+	<script src="public/resource/scripts/common/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var Event = {
+			init: function() {
+				Event.gradeSelected();
+				Event.radioChecked();
+				Event.checkBoxChecked();
+				Event.popupShow();
+				Event.judgeSubmit();
+			},
+			test() {
+				$('html').click(function() {
+					$("#answered").removeClass('none');
+				});
+			},
+			judgeSubmit: function() {
+				var answers = [];
+				var flag = true;
+				$(".question").each(function() {
+					if ($(this).attr('data-judge') == 'radio') {
+						var RadioValue = $(this).find('input:checked').val();
+						var surveyRadioId = $(this).find('h2 span').attr('data-survey-question-id');
+						answers.push({"survey_question_id":surveyRadioId,"content":RadioValue});
+					} else if ($(this).attr('data-judge') == 'checkBox') {
+						var surveyCheckboxId = $(this).find('h2 span').attr('data-survey-question-id');
+						var checkBoxArr = [];
+						$(this).find('input:checked').each(function(){ 
+							checkBoxArr.push($(this).val()); 
+						});
+						answers.push({"survey_question_id":surveyCheckboxId,"content":checkBoxArr.join()})
+					} else if ($(this).attr('data-judge') == 'grade') {
+						var grade = 0;
+						var surveyGradeId = $(this).find('h2 span').attr('data-survey-question-id');
+						$(this).find('.heart li').each(function(){
+							if ($(this).attr('class') == 'selected') {
+								grade++;
+							}
+						});
+						answers.push({"survey_question_id":surveyGradeId,"content":grade});
+					} else if ($(this).attr('data-judge') == 'textarea') {
+						var surveyTextBoxId = $(this).find('h2 span').attr('data-survey-question-id');
+						var surveyText = $(this).find('#textBox-textarea').val();
+						answers.push({"survey_question_id":surveyTextBoxId,"content":surveyText});
+					}
+				});
+				for(var i = 0;i<answers.length;i++) {
+					if (!answers[i].content || answers[i].content == 0) {
+						flag = false;
+					}
+				}
+				if (flag) {
+					$(".surveySubmit").css('background','#EA5C5E');
+					Event.surveySubmit(answers);
+				} else {
+					$(".surveySubmit").css('background','#999');
+					$('footer .surveySubmit').unbind("click");
+				}
+			},
+			gradeSelected: function() {
+				$(".grade .heart li").click(function(event) {
+					$(this).nextAll().removeClass('selected');
+					$(this).prevAll().addClass('selected');
+					$(this).addClass('selected');
+					$("#answered").removeClass('none');
+					
+					Event.judgeSubmit();
+			    });
+			},
+			radioChecked: function() {
+				$(".formRadio").click(function() {
+					$(this).find('p').css("display",'block');
+					$(this).find('span').addClass('checked');
+					$(this).find('label').addClass('checked');
+					$(this).siblings('.formRadio').find('p').css('display','none');
+					$(this).siblings('.formRadio').find('span').removeClass('checked');
+					$(this).siblings('.formRadio').find('label').removeClass('checked');
+					Event.judgeSubmit();
+				});
+			},
+			checkBoxChecked: function() {
+				$(".checkBox label").click(function() {
+					if ($(this).hasClass('bgChecked')) {
+						$(this).removeClass('bgChecked');
+					} else {
+						$(this).addClass('bgChecked');
+					}
+					Event.judgeSubmit();
+					setTimeout(function() {
+						Event.judgeSubmit();
+					},0);
+				});
+			},
+			popupShow: function() {
+				$("#popup .bottom").click(function() {
+			    	$("#popup").addClass('none');
+			    });
+			    $("#popup")[0].addEventListener('touchmove', function(e) {
+			        e.preventDefault();
+			    }, false);
+			    $("#answered .bottom").click(function() {
+			    	$("#answered").addClass('none');
+			    });
+			    $("#answered")[0].addEventListener('touchmove', function(e) {
+			        e.preventDefault();
+			    }, false);
+			},
+			surveySubmit: function(answers) {
+				var answers = answers;
+				$("footer .surveySubmit").unbind("click").click(function() {
+					$.ajax({
+						type:"post",
+						url:"/survey/save",
+						data: {
+							"survey_id":1,
+							"answers":answers
+						},
+						success: function(data) {
+							if (data.code == 200) {
+								
+							}
+							$("#popup").removeClass('none');
+							$("#popup").find('.finish')[0].innerHTML = data.msg;
+						},error: function(data) {
+							console.log(data);
+							$("#popup").removeClass('none');
+							$("#popup").find('.finish')[0].innerHTML = data.msg;
+						}
+					});
+				});
+			},
+			test: function() {
+				console.log(1);
+			}
+		};
+		Event.init();
+	</script>
+</html>

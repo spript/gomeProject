@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html data-use-rem='750'>
+<head>
+    <title th:text="${survey.name}">问卷</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta charset="utf-8" />
+    <style type="text/css">
+        html,
+body,
+div,
+span,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+address,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strong,
+sub,
+sup,
+var,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+html {
+  font-family: "PingFangSC-Light", "Microsoft YaHei", Arial, "Helvetica", sans-serif;
+  font-size: 10px;
+  background: #fff;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+body {
+  background: #f2f2f2;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+address,
+caption,
+cite,
+code,
+dfn,
+i,
+em,
+strong,
+th,
+var {
+  font-weight: normal;
+  font-style: normal;
+}
+ol,
+ul {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  outline: none;
+}
+caption,
+th {
+  text-align: left;
+  font-weight: normal;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+  font-size: 100%;
+}
+.clearfix:after {
+  content: "";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+/*item.less*/
+.share_tips {
+  overflow: hidden;
+  margin-top: .16rem;
+  margin-bottom: .2rem;
+}
+.share_tips li {
+  padding: .06rem .1rem .1rem .28rem;
+  font-size: .18rem;
+}
+.share_tips li.left {
+  float: left;
+}
+.share_tips li.inline {
+  display: inline-block;
+}
+.share_tips li.share {
+  color: #ff3a64;
+  background: url(https://gfs8.gomein.net.cn/T165hvBXYv1RCvBVdK) no-repeat;
+  background-size: 100% 100%;
+}
+.share_tips li.question {
+  color: #ffa229;
+  margin: 0 .18rem;
+  background: url(https://gfs4.gomein.net.cn/T1wVAvB4_g1RCvBVdK) no-repeat;
+  background-size: 100% 100%;
+}
+.share_tips li.video {
+  color: #a07aff;
+  background: url(https://gfs6.gomein.net.cn/T1YkxvB7VT1RCvBVdK) no-repeat;
+  background-size: 100% 100%;
+}
+.clear-font-size {
+  font-size: 0;
+}
+.bottom_tools {
+  background-color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  text-align: center;
+  height: 1rem;
+  border-top: 1px solid #e2e2e2;
+  overflow: hidden;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+}
+.bottom_tools .toolsItem {
+  display: block;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  font-size: .32rem;
+  line-height: 1rem;
+  text-decoration: none;
+}
+.bottom_tools .toolsItem:last-child {
+  background: #ec6c6e;
+  color: #fff;
+}
+.bottom_tools .toolsItem .tool_icon {
+  position: relative;
+  font-style: normal;
+  padding-left: .42rem;
+}
+.bottom_tools .toolsItem .tool_icon:before {
+  position: absolute;
+  content: "";
+  width: .32rem;
+  height: .32rem;
+  top: 50%;
+  left: 0;
+  margin-top: -0.18rem;
+}
+.bottom_tools .toolsItem .tool_icon.share:before {
+  background: url(https://gfs5.gomein.net.cn/T1V5EvBmY_1RCvBVdK);
+  background-size: cover;
+}
+.bottom_tools .toolsItem .tool_icon.question:before {
+  width: .26rem;
+  margin-top: -0.16rem;
+  background: url(https://gfs8.gomein.net.cn/T1n.hvBjLT1RCvBVdK);
+  background-size: cover;
+}
+.bottom_tools .toolsItem .tool_icon.parise:before {
+  background: url(https://gfs.gomein.net.cn/T10EWvBTW_1RCvBVdK);
+  background-size: cover;
+}
+.bottom_tools .toolsItem .tool_icon.parised {
+  color: #ec6c6e;
+}
+.bottom_tools .toolsItem .tool_icon.parised:before {
+  background: url(https://gfs5.gomein.net.cn/T13.JvBjhv1RCvBVdK);
+  background-size: cover;
+}
+.bottom_tools .toolsItem .toolsItem_span {
+  display: inline-block;
+  width: 100%;
+  height: .6rem;
+  margin: .2rem 0;
+  line-height: .6rem;
+  border-left: 1px solid #e2e2e2;
+}
+.detail_footer {
+  width: 100%;
+}
+.detail_footer p {
+  font-size: .26rem;
+  color: #999;
+  height: 1rem;
+  line-height: 1rem;
+  text-align: center;
+  padding-bottom: 1rem;
+}
+#answered {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+}
+#answered .content {
+  width: 6.4rem;
+  height: 3.86rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -3.2rem;
+  margin-top: -1.93rem;
+  z-index: 11;
+}
+#answered .content .top {
+  width: 100%;
+  height: 2.98rem;
+  background: #fff;
+  border-radius: .12rem .12rem 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#answered .content .top .top-finish p {
+  color: #333;
+  font-size: .42rem;
+  text-align: center;
+}
+#answered .content .bottom {
+  display: block;
+  width: 100%;
+  height: .88rem;
+  background: #EA5C5E;
+  text-align: center;
+  line-height: .88rem;
+  color: #fff;
+  font-size: .4rem;
+  border-radius: 0 0 .12rem .12rem;
+}
+body {
+  background: #fff;
+}
+header {
+  padding: 0 .22rem;
+}
+header .header-title {
+  padding: .4rem 0 .3rem 0;
+  text-align: center;
+  font-size: .42rem;
+  color: #333;
+}
+header .header-description {
+  line-height: .48rem;
+  font-size: .26rem;
+  color: #333;
+}
+section {
+  padding: 0 .22rem;
+  margin-top: .5rem;
+}
+section .grade {
+  font-size: .36rem;
+  color: #333;
+}
+section .grade span {
+  margin-right: .1rem;
+}
+section .grade .heart {
+  padding: .4rem 0 .5rem .43rem;
+}
+section .grade .heart ul li {
+  float: left;
+  margin-right: .2rem;
+  width: .34rem;
+  height: .3rem;
+  background: url(https://gfs3.gomein.net.cn/T1ZoxvBgAT1RCvBVdK) no-repeat;
+  background-size: 100%;
+}
+section .grade .heart ul li.selected {
+  background: url(https://gfs.gomein.net.cn/T1FEVvBCDg1RCvBVdK) no-repeat;
+  background-size: 100%;
+}
+section .radio {
+  font-size: .36rem;
+  color: #333;
+}
+section .radio h2 {
+  padding-bottom: .2rem;
+}
+section .radio span {
+  margin-right: .1rem;
+}
+section .radio input[type="radio"] {
+  display: none;
+}
+section .radio label {
+  width: .24rem;
+  height: .24rem;
+  border: 1px solid #666;
+  border-radius: 50%;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+section .radio label p {
+  width: .11rem;
+  height: .1rem;
+  background: #ea5c5e;
+  border-radius: 50%;
+  display: none;
+  margin: auto;
+}
+section .radio label.checked {
+  border: 2px solid #ea5c5e;
+}
+section .radio .formRadio {
+  padding: .2rem .43rem;
+  height: .3rem;
+  position: relative;
+}
+section .radio .formRadio .radioText {
+  font-size: .28rem;
+  color: #666;
+  position: absolute;
+  left: .76rem;
+  top: -0.05rem;
+  padding: .2rem .2rem;
+}
+section .radio .formRadio .radioText.checked {
+  color: #ea5c5e;
+}
+section .checkBox {
+  font-size: .36rem;
+  color: #333;
+  margin-top: .3rem;
+}
+section .checkBox input[type="checkbox"] {
+  display: none;
+}
+section .checkBox span {
+  margin-right: .1rem;
+}
+section .checkBox .content ul li {
+  padding: .24rem 0 .24rem .43rem;
+}
+section .checkBox .content ul li:first-child {
+  margin-top: .16rem;
+}
+section .checkBox .content ul li label {
+  display: inline-block;
+  width: .26rem;
+  height: .28rem;
+  background: url(https://gfs5.gomein.net.cn/T1M5ZvByVT1RCvBVdK) no-repeat;
+  background-size: 100%;
+  border-radius: .03rem;
+  position: relative;
+}
+section .checkBox .content ul li label.bgChecked {
+  background: url(https://gfs2.gomein.net.cn/T1EkZvByKT1RCvBVdK) no-repeat;
+  background-size: 100%;
+}
+section .checkBox .content ul li span {
+  color: #666;
+  font-size: .28rem;
+  width: 2rem;
+  position: absolute;
+  left: .42rem;
+  top: -0.05rem;
+}
+section .textBox {
+  font-size: .36rem;
+  color: #333;
+}
+section .textBox span {
+  margin-right: .1rem;
+}
+section .textBox #textBox-textarea {
+  width: 5.97rem;
+  height: 1.95rem;
+  outline: none;
+  color: #666;
+  margin-left: .43rem;
+  margin-top: .3rem;
+  padding: .18rem;
+  cursor: pointer;
+}
+footer {
+  padding: .5rem .22rem .24rem .22rem;
+  text-align: center;
+}
+footer .surveySubmit {
+  display: inline-block;
+  width: 4.22rem;
+  height: .8rem;
+  line-height: .8rem;
+  text-align: center;
+  font-size: .37rem;
+  color: #fff;
+  background: #EA5C5E;
+  border-radius: .4rem;
+  vertical-align: top;
+  cursor: pointer;
+}
+#popup {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+}
+#popup .content {
+  width: 6.4rem;
+  height: 3.86rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -3.2rem;
+  margin-top: -1.93rem;
+  z-index: 11;
+}
+#popup .content .top {
+  width: 100%;
+  height: 2.98rem;
+  background: #fff;
+  border-radius: .12rem .12rem 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#popup .content .top .top-finish p {
+  color: #333;
+  font-size: .42rem;
+  text-align: center;
+}
+#popup .content .bottom {
+  display: block;
+  width: 100%;
+  height: .88rem;
+  background: #EA5C5E;
+  text-align: center;
+  line-height: .88rem;
+  color: #fff;
+  font-size: .4rem;
+  border-radius: 0 0 .12rem .12rem;
+}
+.none {
+  display: none;
+}
+
+    </style>
+</head>
+<body>
+    <script type="text/javascript">
+    (function(win){var doc=win.document,html=doc.documentElement,option=html.getAttribute("data-use-rem");if(option===null){return}var baseWidth=parseInt(option).toString()==="NaN"?640:parseInt(option);var grids=baseWidth/100;var         clientWidth=html.clientWidth||320;var fontsize=html.style.fontSize=clientWidth/grids+"px";fontsize=parseFloat(fontsize);var maxFontsize=Math.ceil(fontsize);var minFontsize=Math.floor(fontsize);var testDom=document.createElement("div");   var testDomWidth=0;var adjustRatio=0;testDom.style.cssText="height:0;width:1rem;";doc.body.appendChild(testDom);var calcTestDom=function(){testDomWidth=testDom.offsetWidth;                                                                  if(testDomWidth<minFontsize||testDomWidth>maxFontsize){adjustRatio=clientWidth/grids/testDomWidth;var reCalcRem=clientWidth*adjustRatio/grids;html.style.fontSize=reCalcRem+"px"}else{doc.body.removeChild(testDom)}};setTimeout(calcTestDom, 20);var reCalc=function(){var newCW=html.clientWidth;if(newCW===clientWidth){return}clientWidth=newCW;html.style.fontSize=newCW*(adjustRatio?adjustRatio:1)/grids+"px"};if(!doc.addEventListener){return}var resizeEvt="orientationchange"in  win?"orientationchange":"resize";win.addEventListener(resizeEvt,reCalc,false);doc.addEventListener("DOMContentLoaded",reCalc,false)})(window);
+    </script>
+
+
+        <header>
+            <h2 class="header-title" th:text="${survey.name}">
+                NIKE旗舰店满意度调查
+            </h2>
+            <p class="header-description" th:text="${survey.description}">
+                因近日收到多起投诉，所以我们开展全方位的整改行动。我们会根据调查结果尽快改进服务质量，以用户满意。稍后我们会随机抽取幸运被访者，送出现金洪红包。
+            </p>
+        </header>
+        <section>
+            <div th:each="question : ${survey.questions}">
+
+                <div class="radio question" data-judge="radio" th:if="${question.type == 1}">
+                    <h2><span data-survey-question-id='radio1'>[[${question.sequence}]].</span>[[${question.name}]]<em style="color: #EA5C5E;" th:if="${question.isAnswerRequired == 1}">(必答)</em></h2>
+                    <div th:each="option : ${question.options}">
+                        <div class="formRadio"><input type="radio" name="radio"/><label id="label"><p></p><span class="radioText">[[${option.title}]]</span></label></div>
+                    </div>
+                </div>
+
+
+
+                <div class="checkBox question" data-judge="checkBox" th:if="${question.type == 2}">
+                    <h2><span data-survey-question-id='duoxuan1'>[[${question.sequence}]].</span>[[${question.name}]]<em style="color: #EA5C5E;" th:if="${question.isAnswerRequired == 1}">(必答)</em></h2>
+                    <div class="content">
+                        <ul th:each="option : ${question.options}">
+                            <li><input type="checkbox" id="box1"/><label for="box1"><span>[[${option.title}]]</span></label></li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="grade question" data-judge="grade" th:if="${question.type == 3}">
+                    <h2><span data-survey-question-id='fenshu'>[[${question.sequence}]].</span>[[${question.name}]]<em style="color: #EA5C5E;" th:if="${question.isAnswerRequired == 1}">(必答)</em></h2>
+                    <div class="heart">
+                        <ul class="clearfix">
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="textBox question" data-judge="textarea" th:if="${question.type == 4}">
+                    <h2><span data-survey-question-id='yijian'>[[${question.sequence}]].</span>[[${question.name}]]<em style="color: #EA5C5E;" th:if="${question.isAnswerRequired == 1}">(必答)</em></h2>
+                    <textarea onkeyup="Event.judgeSubmit();" placeholder="这里是意见......" id="textBox-textarea"></textarea>
+                </div>
+
+            </div>
+
+
+
+        </section>
+
+        <footer>
+            <a class="surveySubmit">提交</a>
+        </footer>
+    
+        <div id="popup" class="none">
+            <div class="content">
+                <div class="top">
+                    <div class="top-finish">
+                        <p class="finish">答题完成</p>
+                        <p class="thank">感谢您的参与</p>
+                    </div>
+                </div>
+                <a href="javascript:;" class="bottom">完成</a>
+            </div>
+        </div>
+    </body>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        var Event = {
+            init: function() {
+                Event.gradeSelected();
+                Event.radioChecked();
+                Event.checkBoxChecked();
+                Event.popupShow();
+                Event.judgeSubmit();
+                if (/Android/.test(navigator.appVersion)) {
+                    $(".textBox textarea").focus(function() {
+
+                    });
+                }
+            },
+            judgeSubmit: function() {
+                var answers = [];
+                var flag = true;
+                $(".question").each(function() {
+                    if ($(this).attr('data-judge') == 'radio') {
+                        var RadioValue = $(this).find('input:checked').val();
+                        var surveyRadioId = $(this).find('h2 span').attr('data-survey-question-id');
+                        answers.push({"survey_question_id":surveyRadioId,"content":RadioValue});
+                    } else if ($(this).attr('data-judge') == 'checkBox') {
+                        var surveyCheckboxId = $(this).find('h2 span').attr('data-survey-question-id');
+                        var checkBoxArr = [];
+                        $(this).find('input:checked').each(function(){
+                            checkBoxArr.push($(this).val());
+                        });
+                        console.log(checkBoxArr);
+                        answers.push({"survey_question_id":surveyCheckboxId,"content":checkBoxArr.join()})
+                    } else if ($(this).attr('data-judge') == 'grade') {
+                        var grade = 0;
+                        var surveyGradeId = $(this).find('h2 span').attr('data-survey-question-id');
+                        $(this).find('.heart li').each(function(){
+                            if ($(this).attr('class') == 'selected') {
+                                grade++;
+                            }
+                        });
+                        answers.push({"survey_question_id":surveyGradeId,"content":grade});
+                    } else if ($(this).attr('data-judge') == 'textarea') {
+                        var surveyTextBoxId = $(this).find('h2 span').attr('data-survey-question-id');
+                        var surveyText = $(this).find('#textBox-textarea').val();
+                        answers.push({"survey_question_id":surveyTextBoxId,"content":surveyText});
+                    }
+                });
+                console.log('---------------------');
+                for(var i = 0;i<answers.length;i++) {
+                    console.log(answers[i]);
+                    if (!answers[i].content || answers[i].content == 0) {
+                        flag = false;
+                    }
+                }
+                if (flag) {
+                    $(".surveySubmit").css('background','#EA5C5E');
+                    Event.surveySubmit(answers);
+                } else {
+                    $(".surveySubmit").css('background','#999');
+                    $('footer .surveySubmit').unbind("click");
+                }
+            },
+            gradeSelected: function() {
+                $(".grade .heart li").click(function(event) {
+                    $(this).nextAll().removeClass('selected');
+                    $(this).prevAll().addClass('selected');
+                    $(this).addClass('selected');
+                    setTimeout(function() {
+                        Event.judgeSubmit();
+                    },0)
+                });
+            },
+            radioChecked: function() {
+                $(".formRadio label").click(function() {
+                    $(this).find('p').css("display",'block');
+                    $(this).find('span').addClass('checked');
+                    $(this).addClass('checked');
+                    $(this).parent('.formRadio').siblings().find('p').css('display','none');
+                    $(this).parent('.formRadio').siblings().find('span').removeClass('checked');
+                    $(this).parent('.formRadio').siblings().find('label').removeClass('checked');
+                    setTimeout(function() {
+                        Event.judgeSubmit();
+                    },0)
+                });
+            },
+            checkBoxChecked: function() {
+                $(".checkBox label").click(function() {
+                    if ($(this).hasClass('bgChecked')) {
+                        $(this).removeClass('bgChecked');
+                    } else {
+                        $(this).addClass('bgChecked');
+                    }
+                    setTimeout(function() {
+                        Event.judgeSubmit();
+                    },0)
+                });
+            },
+            popupShow: function() {
+                $("#popup .bottom").click(function() {
+                    $("#popup").addClass('none');
+                });
+                $("#popup")[0].addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                }, false);
+            },
+            surveySubmit: function(answers) {
+                var answers = answers;
+                $("footer .surveySubmit").unbind("click").click(function() {
+                    $.ajax({
+                        type:"post",
+                        url:"/survey/save",
+                        data: {
+                            "survey_id":1,
+                            "answers":answers
+                        },
+                        success: function(data) {
+                            if (data.code == 200) {
+
+                            }
+                            $("#popup").removeClass('none');
+                            $("#popup").find('.finish')[0].innerHTML = data.msg;
+                        },error: function(data) {
+                            console.log(data);
+                            $("#popup").removeClass('none');
+                            $("#popup").find('.finish')[0].innerHTML = data.msg;
+                        }
+                    });
+                });
+            }
+        };
+        Event.init();
+    </script>
+</html>

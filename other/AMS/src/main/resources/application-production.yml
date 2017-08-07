@@ -1,0 +1,12 @@
+spring:
+    application:
+        name: ams
+
+    profiles:
+        active: production
+
+server:
+    port: 9001
+    contextPath:
+
+privilege_system_id: 1

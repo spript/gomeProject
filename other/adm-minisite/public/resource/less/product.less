@@ -1,0 +1,139 @@
+@import './base.less';
+@import './common.less';
+.product-detail{
+	background: #fff;
+	.proudct-img{
+		width: 100%;
+		font-size: 0;
+		img{
+			width: 100%;
+		}
+	}
+	.product-title{
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0 .22rem;
+		margin-top: .3rem;
+		h2, .product-price{
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			box-sizing: border-box;
+		}
+		h2{
+			max-width: 80%;
+			float: left;
+			margin-bottom: .04rem;
+			font-size: .48rem;
+			color: #333;
+		}
+		.product-price{
+			float: right;
+			max-width: 20%;
+			font-size: .36rem;
+			line-height: .6rem;
+			color: #e85c5d;
+			span{
+				font-size: .36rem;
+			}
+		}
+	}
+	.product-desc{
+		padding: .5rem 0 0;
+		font-size: .32rem;
+		color: #000;
+		line-height: .52rem;
+		border-top: 1px solid #f1f1f1;
+		margin-top: .3rem;
+	}
+	a:nth-of-type(2){
+		display: block;
+		padding: 0 .22rem;
+	}
+	.product-count{
+		width: 100%;
+		padding: .3rem .22rem .5rem;
+		box-sizing: border-box;
+		border-bottom: 1px solid #ddd;
+		.collect{
+			height: .4rem;
+			float: right;
+			font-size: .22rem;
+			text-align: center;
+			position: relative;
+			color: #666;
+			img {
+				width: .22rem;
+				height: .22rem;
+				margin-right: .06rem;
+				vertical-align: middle;
+			}
+			span {
+				vertical-align: middle;
+				line-height: .44rem;
+				font-size: .24rem;
+			}
+			&:after {
+				content: '';
+				width: 200%;
+				height: 200%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				border: 1px solid #999;
+				border-radius: 20px;
+				-webkit-transform: scale(0.5, 0.5);
+				transform: scale(0.5, 0.5);
+				-webkit-transform-origin: top left;
+			}
+		}
+	}
+}
+.share_tips{
+	margin: .14rem 0 0 0;
+	padding: 0 .22rem;
+}
+.product-others{
+	background: #f2f2f2;
+	.title{
+		width: 100%;
+		margin-top: .17rem;
+		font-size: .26rem;
+		color: #333;
+		text-align: center;
+		border-top: 1px solid #ddd;
+		line-height: .84rem;
+		background: #fff;
+	}
+	.product-others-list{
+		display: flex;
+		flex-flow: row wrap;
+		align-content: flex-start;
+		background: #fff;
+		width: 100%;
+		padding: 0 .12rem 1.2rem;
+		box-sizing: border-box;
+		.list-item{
+			box-sizing: border-box;
+			position: relative;
+			width: 33.3%;
+			padding: .05rem;
+			flex: 0 0 33.3%;
+			font-size: 0;
+			img{
+				width: 100%;
+			}
+			.item-price{
+				position: absolute;
+				bottom: 0.05rem;
+				width: 100%;
+				height: .32rem;
+				font-size: .18rem;
+				color: #656565;
+				line-height: .32rem;
+				text-align: center;
+				background: rgba(255, 255, 255, 0.6);
+			}
+		}
+	}
+}

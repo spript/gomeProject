@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html data-use-rem="750">
+  <head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>视频</title>
+  </head>
+  <body>
+    <script>
+    (function(win){var doc=win.document,html=doc.documentElement,option=html.getAttribute("data-use-rem");if(option===null){return}var baseWidth=parseInt(option).toString()==="NaN"?640:parseInt(option);var grids=baseWidth/100;var clientWidth=html.clientWidth||320;var fontsize=html.style.fontSize=clientWidth/grids+"px";fontsize=parseFloat(fontsize);var maxFontsize=Math.ceil(fontsize);var minFontsize=Math.floor(fontsize);var testDom=document.createElement("div");var testDomWidth=0;var adjustRatio=0;testDom.style.cssText="height:0;width:1rem;";doc.body.appendChild(testDom);var calcTestDom=function(){testDomWidth=testDom.offsetWidth;if(testDomWidth<minFontsize||testDomWidth>maxFontsize){adjustRatio=clientWidth/grids/testDomWidth;var reCalcRem=clientWidth*adjustRatio/grids;html.style.fontSize=reCalcRem+"px"}else{doc.body.removeChild(testDom)}};setTimeout(calcTestDom,20);var reCalc=function(){var newCW=html.clientWidth;if(newCW===clientWidth){return}clientWidth=newCW;html.style.fontSize=newCW*(adjustRatio?adjustRatio:1)/grids+"px"};if(!doc.addEventListener){return}var resizeEvt="orientationchange"in win?"orientationchange":"resize";win.addEventListener(resizeEvt,reCalc,false);doc.addEventListener("DOMContentLoaded",reCalc,false)})(window);
+    </script>
+    <section class="videoDetail">
+        <div class="video_header">
+            <div class="video-box videoContainer" id="video_" data-videoid="">
+                <a href="javascript:void(0);" class="video-play">
+                    <em class="iconmoon"></em>
+                    <strong></strong>
+                </a>
+                <img src="http://css.meixincdn.com/m/h5/dist/images/default_product.png" alt="图片" data-src="' .$coverImage. '">
+            </div>
+            <div class="video_content">
+                <h2>卡地亚珠宝钻戒</h2>
+                <ul class="share_tips">
+                    <li>分享赚0.03元</li>
+                    <li>调研赚0.03元</li>
+                    <li>视频赚0.03元</li>
+                </ul>
+                <p>一家法国钟表一家法国钟表一家法国钟表一家法国钟表一家法国钟表一家法国钟表</p>
+            </div>
+        </div>
+        <div class="video_templet_shop" style="display:none;">
+            <div class="video_inner">
+                <img src="http://css.meixincdn.com/m/h5/dist/images/default_product.png" alt="" />
+                <h2>卡地亚官方旗舰店</h2>
+                <p>卡地亚官方旗舰店卡地亚官方旗舰店卡地亚官方旗舰店卡地亚官方旗舰店</p>
+                <a href="" class="goShop">进入店铺</a>
+            </div>
+        </div>
+        <div class="video_templet_list">
+            <div class="video_list">
+                <ul>
+                    <li>
+                        <img src="http://css.meixincdn.com/m/h5/dist/images/default_product.png" alt="" />
+                        <div class="shop_item_right">
+                            <h2>LOVE钻戒</h2>
+                            <p>卡地亚官方旗舰店卡地亚官方旗舰店卡地亚官方旗舰店卡地亚官方</p>
+                            <span>￥ 6990</span>
+                        </div>
+                    </li>
+                    <li>
+                        <img src="http://css.meixincdn.com/m/h5/dist/images/default_product.png" alt="" />
+                        <div class="shop_item_right">
+                            <h2>LOVE钻戒</h2>
+                            <p>卡地亚官方旗舰店卡地亚官方旗舰店卡地亚官方旗舰店卡地亚官方</p>
+                            <span>￥ 6990</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="detail_footer">
+                <p>价格以商品详情页为准</p>
+            </div>
+        </div>
+        <div class="bottom_tools">
+            <div class="toolsItem">赞</div>
+            <div class="toolsItem">问卷</div>
+            <div class="toolsItem">分享</div>
+        </div>
+    </section>
+    <!-- built files will be auto injected -->
+  </body>
+  
+</html>
